@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Shuffle, TrendingUp, Award, Filter } from 'lucide-react';
 import { ExerciseCard } from '../components/ExerciseCard';
-import { getExercisesByTypeAndLevel } from '../data/exercises';
+import { Exercise, getExercises, getExercisesByTandL, getExercisesByTypeAndLevel } from '../data/exercises';
 import { JLPTLevel, QuestionType } from '../types';
 import { Layout } from '../components/Layout';
 import { RandomExerciseModal } from '../components/RandomExerciseModal';
@@ -10,6 +10,7 @@ import { RandomExerciseModal } from '../components/RandomExerciseModal';
 export function PracticeList() {
   const { type } = useParams<{ type: QuestionType }>();
   const navigate = useNavigate();
+  const [exercises, setExercises] = useState<Exercise[]>([]);
   const [selectedLevel, setSelectedLevel] = useState<JLPTLevel>('N5');
   const [filterDifficulty, setFilterDifficulty] = useState<'all' | 'easy' | 'medium' | 'hard'>('all');
   const [showRandomExerciseModal, setShowRandomExerciseModal] = useState(false);
@@ -18,7 +19,18 @@ export function PracticeList() {
     return <div>Không tìm thấy loại bài tập</div>;
   }
   
-  const exercises = getExercisesByTypeAndLevel(type as QuestionType, selectedLevel);
+  //const exercises = getExercisesByTypeAndLevel(type as QuestionType, selectedLevel);
+  //const exercises = getExercisesByTandL(type as QuestionType, selectedLevel);
+  
+
+useEffect(() => {
+  const loadExercises = async () => {
+    const data = await getExercisesByTandL(type as QuestionType, selectedLevel);
+    setExercises(data);
+  };
+
+  loadExercises();
+}, [selectedLevel,filterDifficulty,type]);
   const filteredExercises = filterDifficulty === 'all'
     ? exercises
     : exercises.filter(ex => ex.difficulty === filterDifficulty);

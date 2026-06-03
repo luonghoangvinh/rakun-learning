@@ -40,28 +40,28 @@ export function Home() {
       value: stats.totalQuestions,
       icon: FileText,
       color: 'bg-blue-500',
-      change: '+12 hôm nay'
+      change: ''
     },
     {
       label: 'Độ chính xác',
       value: `${stats.accuracy.toFixed(1)}%`,
       icon: Target,
       color: 'bg-green-500',
-      change: '+5% tuần này'
+      change: ''
     },
     {
       label: 'Streak hiện tại',
       value: `${stats.streak} ngày`,
       icon: Zap,
       color: 'bg-orange-500',
-      change: 'Tuyệt vời!'
+      change: ''
     },
     {
       label: 'Tổng điểm',
       value: stats.points,
       icon: Trophy,
       color: 'bg-purple-500',
-      change: '+180 tuần này'
+      change: ''
     }
   ];
   
@@ -114,7 +114,7 @@ export function Home() {
         <div className="relative z-10">
           <div className="flex items-start justify-between mb-6">
             <div>
-              <h2 className="text-3xl font-bold mb-2">Chào buổi sáng, Học viên! 👋</h2>
+              <h2 className="text-3xl font-bold mb-2">Chào buổi sáng, Học viên! </h2>
               <p className="text-blue-100">Sẵn sàng chinh phục JLPT hôm nay chưa?</p>
             </div>
             <div className="text-6xl opacity-20">🎌</div>

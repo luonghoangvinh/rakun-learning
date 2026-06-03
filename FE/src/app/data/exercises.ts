@@ -16,7 +16,7 @@ export interface Exercise {
 }
 
 // Generate mock exercises
-export const generateExercises= (): Exercise[] => {
+export const generateExercises = (): Exercise[] => {
   const exercises: Exercise[] = [];
 
   const types: QuestionType[] = ['vocabulary', 'grammar', 'listening', 'reading'];
@@ -44,7 +44,7 @@ export const generateExercises= (): Exercise[] => {
       }
     });
   });
-  
+
   return exercises;
 };
 
@@ -95,7 +95,7 @@ function getExerciseDescription(type: QuestionType, level: JLPTLevel, num: numbe
       'Đọc văn bản phức tạp'
     ]
   };
-  
+
   return descriptions[type][(num - 1) % descriptions[type].length];
 }
 
@@ -105,7 +105,21 @@ export function getExercisesByTypeAndLevel(type: QuestionType, level: JLPTLevel)
   return allExercises.filter(ex => ex.type === type && ex.level === level);
 }
 
+export function getExercisesByTandL(type: QuestionType, level: JLPTLevel) {
+  const getExercisesByTypeAndLevel = async (type: QuestionType, level: JLPTLevel) => {
+    try {
+      const res = await fetch('/api/exercises');
+      const exercises: Exercise[] = await res.json();
+      return exercises.filter(ex => ex.type === type && ex.level === level);
+    } catch (error) {
+      console.error('Error fetching exercises:', error);
+      return [];
+    }
+  }
+  return getExercisesByTypeAndLevel(type, level);
+}
+
 export function getExerciseById(id: string): Exercise | undefined {
-  
+
   return allExercises.find(ex => ex.id === id);
 }
