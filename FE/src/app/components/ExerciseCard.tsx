@@ -21,7 +21,7 @@ export function ExerciseCard({ exercise }: ExerciseCardProps) {
   
   return (
     <Link
-      to={`/practice-session/${exercise.id}`}
+      to={`/practice-session/${exercise._id}`}
       className="group block bg-white rounded-xl shadow-sm border-2 border-gray-200 hover:border-blue-500 hover:shadow-lg transition-all duration-300 overflow-hidden"
     >
       <div className="p-6">

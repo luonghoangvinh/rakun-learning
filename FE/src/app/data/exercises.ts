@@ -1,8 +1,8 @@
 
-import { JLPTLevel, QuestionType } from '../types';
+import { JLPTLevel, Question, QuestionType } from '../types';
 
 export interface Exercise {
-  id: string;
+  _id: string;
   title: string;
   //questionIDs: string[]; // List of question IDs associated with this exercise
   description: string;
@@ -30,7 +30,7 @@ export const generateExercises = (): Exercise[] => {
       for (let i = 1; i <= count; i++) {
         const difficulty = i <= 2 ? 'easy' : i <= 4 ? 'medium' : 'hard';
         exercises.push({
-          id: `${type}-${level}-${i}`,
+          _id: `${type}-${level}-${i}`,
           title: `${getTypeName(type)} ${level} - Bài ${i}`,
           description: getExerciseDescription(type, level, i),
           type,
@@ -101,25 +101,40 @@ function getExerciseDescription(type: QuestionType, level: JLPTLevel, num: numbe
 
 export const allExercises = generateExercises();
 
-export function getExercisesByTypeAndLevel(type: QuestionType, level: JLPTLevel): Exercise[] {
-  return allExercises.filter(ex => ex.type === type && ex.level === level);
-}
-
-export function getExercisesByTandL(type: QuestionType, level: JLPTLevel) {
-  const getExercisesByTypeAndLevel = async (type: QuestionType, level: JLPTLevel) => {
+export function getExercisesByTypeAndLevel(type: QuestionType, level: JLPTLevel){
+  const getExercises = async (type: QuestionType, level: JLPTLevel) => {
     try {
-      const res = await fetch('/api/exercises');
-      const exercises: Exercise[] = await res.json();
-      return exercises.filter(ex => ex.type === type && ex.level === level);
+      const exercises = await fetch(`/api/exercises/findBy?type=${type}&level=${level}`);
+      const data: Exercise[] = await exercises.json();
+      return data;
     } catch (error) {
       console.error('Error fetching exercises:', error);
       return [];
     }
   }
-  return getExercisesByTypeAndLevel(type, level);
+  return getExercises(type, level);
 }
 
-export function getExerciseById(id: string): Exercise | undefined {
 
-  return allExercises.find(ex => ex.id === id);
+
+export async function getExerciseById(id: string): Promise<Exercise | undefined> {
+  try{
+    const exercise = await fetch(`/api/exercises/${id}`);
+    const data: Exercise = await exercise.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching exercise:', error);
+    return undefined;
+  }
+}
+
+export async function getExercisesQuestion(exerciseId: string): Promise<Question[]> {
+  try{
+    const res= await fetch(`/api/exercises/${exerciseId}/questions`);
+    const data: Question[] = await res.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching exercise questions:', error);
+    return [];
+  }
 }

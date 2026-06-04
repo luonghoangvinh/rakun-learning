@@ -4,6 +4,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Exercise, ExerciseSchema } from './exercise.entity';
 import { ExerciseController } from './exercise.controller';
 import { ExerciseService } from './exercise.service';
+import { QuestionModule } from '../question/question.module';
 
 @Module({
     imports: [
@@ -13,6 +14,7 @@ import { ExerciseService } from './exercise.service';
                 schema: ExerciseSchema,
             },
         ]),
+        QuestionModule,
     ],
     controllers: [ExerciseController],
     providers: [ExerciseService],

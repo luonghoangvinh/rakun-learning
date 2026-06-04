@@ -1,12 +1,24 @@
 import { useParams, useSearchParams, Link } from 'react-router-dom';
 import { CheckCircle, XCircle, Trophy, Clock, Target, TrendingUp, Home, RotateCcw } from 'lucide-react';
-import { getExerciseById } from '../data/exercises';
+import { Exercise, getExerciseById } from '../data/exercises';
+import { useEffect, useState } from 'react';
 
 export function PracticeResult() {
   const { exerciseId } = useParams<{ exerciseId: string }>();
   const [searchParams] = useSearchParams();
   const score = parseInt(searchParams.get('score') || '0');
-  const exercise = getExerciseById(exerciseId || '');
+  const [exercise, setExercise] = useState<Exercise | undefined>(undefined);
+
+  useEffect(() => {
+    const loadExercise = async () => {
+      if (exerciseId) {
+        const data = await getExerciseById(exerciseId);
+        setExercise(data);
+      }
+    };
+
+    loadExercise();
+  }, [exerciseId]);
 
   if (!exercise) {
     return (

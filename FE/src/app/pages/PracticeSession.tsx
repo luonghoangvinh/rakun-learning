@@ -3,14 +3,14 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, CheckCircle, XCircle, Clock, Flag } from 'lucide-react';
 import { Question, JLPTLevel, QuestionType } from '../types';
 import { getQuestionsByType } from '../data/mockData';
-import { getExerciseById } from '../data/exercises';
+import { Exercise, getExerciseById, getExercisesQuestion } from '../data/exercises';
 import { saveUserAnswer } from '../utils/storage';
 
 export function PracticeSession() {
   const { exerciseId } = useParams<{ exerciseId: string }>();
   const navigate = useNavigate();
-  const exercise = getExerciseById(exerciseId || '');
-  
+  const [exercise, setExercise] = useState<Exercise | undefined>(undefined);
+
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
@@ -18,26 +18,49 @@ export function PracticeSession() {
   const [startTime, setStartTime] = useState<number>(Date.now());
   const [answers, setAnswers] = useState<boolean[]>([]);
   const [timeElapsed, setTimeElapsed] = useState(0);
-  
+
+
+  const [correctCount, setCorrectCount] = useState(0);
+
+  const loadExercise = async () => {
+    if (exerciseId) {
+      const data = await getExerciseById(exerciseId);
+      setExercise(data);
+    }
+  };
+
+  useEffect(() => {
+    loadExercise();
+  }, [exerciseId]);
+
   useEffect(() => {
     if (exercise) {
-  
-      const qs = getQuestionsByType(exercise.type, exercise.level);
+
+      //const qs = getQuestionsByType(exercise.type, exercise.level);
       // Take only the number of questions needed
-      const selectedQuestions = qs.slice(0, Math.min(exercise.questionCount, qs.length));
-      setQuestions(selectedQuestions);
+      const getQuestions = async (exerciseId: string) => {
+        try {
+          const questions = await getExercisesQuestion(exerciseId);
+          setQuestions(questions);
+
+        } catch (error) {
+          console.error('Error fetching exercise questions:', error);
+          setQuestions([]);
+        }
+      }
+      getQuestions(exercise._id);
     }
   }, [exercise]);
-  
+
   useEffect(() => {
     // Timer
     const timer = setInterval(() => {
       setTimeElapsed(Math.floor((Date.now() - startTime) / 1000));
     }, 1000);
-    
+
     return () => clearInterval(timer);
   }, [startTime]);
-  
+
   if (!exercise) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -51,44 +74,45 @@ export function PracticeSession() {
       </div>
     );
   }
-  
+
   const currentQuestion = questions[currentQuestionIndex];
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
-  
+
   const handleAnswerSelect = (answerIndex: number) => {
     if (!showResult) {
       setSelectedAnswer(answerIndex);
     }
   };
-  
+
   const handleSubmit = () => {
     if (selectedAnswer === null || !currentQuestion) return;
-    
+
     setShowResult(true);
-    
+
     // Save user answer
     const isCorrect = selectedAnswer === currentQuestion.correctAnswer;
     const timeSpent = Math.floor((Date.now() - startTime) / 1000);
-    
+    setCorrectCount(prev => prev + (isCorrect ? 1 : 0));
+
     saveUserAnswer({
-      questionId: currentQuestion.id,
+      questionId: currentQuestion._id,
       type: currentQuestion.type,
       level: currentQuestion.level,
       isCorrect,
       timeSpent,
       answeredAt: new Date()
     });
-    
+
     // Store answer
     const newAnswers = [...answers];
     newAnswers[currentQuestionIndex] = isCorrect;
     setAnswers(newAnswers);
   };
-  
+
   const handleNext = () => {
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
@@ -100,12 +124,12 @@ export function PracticeSession() {
       handleFinish();
     }
   };
-  
+
   const handleFinish = () => {
-    const score = Math.round((answers.filter(a => a).length / answers.length) * 100);
+    const score = Math.round((correctCount / exercise.questionCount) * 100);
     navigate(`/practice-result/${exerciseId}?score=${score}`);
   };
-  
+
   if (questions.length === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -116,7 +140,7 @@ export function PracticeSession() {
       </div>
     );
   }
-  
+
   return (
     <div className="min-h-screen bg-gray-50 py-6">
       <div className="max-w-4xl mx-auto px-4">
@@ -137,7 +161,7 @@ export function PracticeSession() {
                 </p>
               </div>
             </div>
-            
+
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2 text-gray-700">
                 <Clock className="size-5" />
@@ -152,28 +176,27 @@ export function PracticeSession() {
               </button>
             </div>
           </div>
-          
+
           {/* Progress bar */}
           <div className="mt-4">
             <div className="flex items-center gap-2 mb-2">
               {questions.map((_, index) => (
                 <div
                   key={index}
-                  className={`flex-1 h-2 rounded-full transition-all ${
-                    index < currentQuestionIndex
+                  className={`flex-1 h-2 rounded-full transition-all ${index < currentQuestionIndex
                       ? answers[index]
                         ? 'bg-green-500'
                         : 'bg-red-500'
                       : index === currentQuestionIndex
-                      ? 'bg-blue-500'
-                      : 'bg-gray-200'
-                  }`}
+                        ? 'bg-blue-500'
+                        : 'bg-gray-200'
+                    }`}
                 ></div>
               ))}
             </div>
           </div>
         </div>
-        
+
         {/* Question */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
           <div className="mb-6">
@@ -189,29 +212,29 @@ export function PracticeSession() {
               {currentQuestion.question}
             </h3>
           </div>
-          
+
           {/* Options */}
           <div className="space-y-3 mb-6">
             {currentQuestion.options.map((option, index) => {
               const isSelected = selectedAnswer === index;
               const isCorrect = index === currentQuestion.correctAnswer;
+
               const showCorrect = showResult && isCorrect;
               const showIncorrect = showResult && isSelected && !isCorrect;
-              
+
               return (
                 <button
                   key={index}
                   onClick={() => handleAnswerSelect(index)}
                   disabled={showResult}
-                  className={`w-full p-4 rounded-lg border-2 text-left transition-all ${
-                    showCorrect
+                  className={`w-full p-4 rounded-lg border-2 text-left transition-all ${showCorrect
                       ? 'border-green-500 bg-green-50'
                       : showIncorrect
-                      ? 'border-red-500 bg-red-50'
-                      : isSelected
-                      ? 'border-blue-500 bg-blue-50'
-                      : 'border-gray-200 hover:border-gray-300 bg-white'
-                  }`}
+                        ? 'border-red-500 bg-red-50'
+                        : isSelected
+                          ? 'border-blue-500 bg-blue-50'
+                          : 'border-gray-200 hover:border-gray-300 bg-white'
+                    }`}
                 >
                   <div className="flex items-center justify-between">
                     <span className="font-medium text-gray-900">{option}</span>
@@ -222,7 +245,7 @@ export function PracticeSession() {
               );
             })}
           </div>
-          
+
           {/* Explanation */}
           {showResult && currentQuestion.explanation && (
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
@@ -235,7 +258,7 @@ export function PracticeSession() {
               </div>
             </div>
           )}
-          
+
           {/* Action buttons */}
           <div className="flex gap-3">
             {!showResult ? (

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Shuffle, TrendingUp, Award, Filter } from 'lucide-react';
 import { ExerciseCard } from '../components/ExerciseCard';
-import { Exercise, getExercises, getExercisesByTandL, getExercisesByTypeAndLevel } from '../data/exercises';
+import { Exercise, getExercisesByTypeAndLevel } from '../data/exercises';
 import { JLPTLevel, QuestionType } from '../types';
 import { Layout } from '../components/Layout';
 import { RandomExerciseModal } from '../components/RandomExerciseModal';
@@ -19,13 +19,11 @@ export function PracticeList() {
     return <div>Không tìm thấy loại bài tập</div>;
   }
   
-  //const exercises = getExercisesByTypeAndLevel(type as QuestionType, selectedLevel);
-  //const exercises = getExercisesByTandL(type as QuestionType, selectedLevel);
   
 
 useEffect(() => {
   const loadExercises = async () => {
-    const data = await getExercisesByTandL(type as QuestionType, selectedLevel);
+    const data = await getExercisesByTypeAndLevel(type as QuestionType, selectedLevel);
     setExercises(data);
   };
 
@@ -54,13 +52,13 @@ useEffect(() => {
     reading: '📖'
   };
 
-  const handleStartRandomExercise = (level: JLPTLevel) => {
+  const handleStartRandomExercise = async (level: JLPTLevel) => {
     // Navigate to a random exercise for this type and level
     // For now, just navigate to the first exercise of this type/level
-    const levelExercises = getExercisesByTypeAndLevel(type as QuestionType, level);
+    const levelExercises = await getExercisesByTypeAndLevel(type as QuestionType, level);
     if (levelExercises.length > 0) {
       const randomIndex = Math.floor(Math.random() * levelExercises.length);
-      navigate(`/practice-session/${levelExercises[randomIndex].id}`);
+      navigate(`/practice-session/${levelExercises[randomIndex]._id}`);
     }
   };
 
@@ -155,9 +153,7 @@ useEffect(() => {
             </div>
           </div>
           
-          <div className="text-sm text-gray-600">
-            Hiển thị {filteredExercises.length} bài tập
-          </div>
+      
         </div>
         
         {/* Quick stats */}
@@ -215,7 +211,7 @@ useEffect(() => {
         {filteredExercises.length > 0 ? (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredExercises.map((exercise) => (
-              <ExerciseCard key={exercise.id} exercise={exercise} />
+              <ExerciseCard key={exercise._id} exercise={exercise} />
             ))}
           </div>
         ) : (

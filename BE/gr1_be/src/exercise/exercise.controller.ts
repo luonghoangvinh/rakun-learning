@@ -43,6 +43,12 @@ export class ExerciseController {
     ) {
         return this.exerciseService.findById(id);
     }
+    @Get(':id/questions')
+    getQuestionsByExerciseId(
+        @Param('id') exerciseId: string,
+    ) {
+        return this.exerciseService.getQuestionsByExerciseId(exerciseId);
+    }
 
     @Patch(':id')
     update(

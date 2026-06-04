@@ -12,7 +12,7 @@ export type DeckVisibility = 'personal' | 'community';
 
 // Question data
 export interface Question {
-  id: string;
+  _id: string;
   type: QuestionType;
   level: JLPTLevel;
   audioURL?: string; // For listening questions

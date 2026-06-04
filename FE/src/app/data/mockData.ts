@@ -36,7 +36,7 @@ export const questionCategories: QuestionCategory[] = [
 // Mock questions
 export const mockQuestions: Question[] = [
   {
-    id: 'q1',
+    _id: 'q1',
     type: 'vocabulary',
     level: 'N5',
     question: '私は＿＿＿学生です。',
@@ -45,7 +45,7 @@ export const mockQuestions: Question[] = [
     explanation: '「が」được sử dụng để nhấn mạnh chủ ngữ'
   },
   {
-    id: 'q2',
+    _id: 'q2',
     type: 'grammar',
     level: 'N5',
     question: '毎日日本語＿＿＿勉強します。',
@@ -54,7 +54,7 @@ export const mockQuestions: Question[] = [
     explanation: '「を」được sử dụng để đánh dấu tân ngữ trực tiếp'
   },
   {
-    id: 'q3',
+    _id: 'q3',
     type: 'reading',
     level: 'N4',
     question: 'このりんごは＿＿＿です。',
@@ -62,7 +62,7 @@ export const mockQuestions: Question[] = [
     correctAnswer: 0
   },
   {
-    id: 'q4',
+    _id: 'q4',
     type: 'vocabulary',
     level: 'N3',
     question: '彼は会議に＿＿＿しました。',

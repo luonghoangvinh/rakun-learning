@@ -8,12 +8,16 @@ import { Model } from 'mongoose';
 import { Exercise } from './exercise.entity';
 import { CreateExerciseDto } from './dto/create-exercise.dto';
 import { UpdateExerciseDto } from './dto/update-exercise.dto';
+import { Question } from '../question/question.entity';
 
 @Injectable()
 export class ExerciseService {
     constructor(
         @InjectModel(Exercise.name)
         private readonly exerciseModel: Model<Exercise>,
+
+        @InjectModel(Question.name)
+        private readonly questionModel: Model<Question>,
     ) { }
 
     async create(dto: CreateExerciseDto) {
@@ -86,5 +90,16 @@ export class ExerciseService {
         }
 
         return this.exerciseModel.find(filter);
+    }
+    async getQuestionsByExerciseId(exerciseId: string) {
+        const exercise = await this.exerciseModel.findById(exerciseId);
+
+        if (!exercise) {
+            throw new NotFoundException('Exercise not found');
+        }
+
+        return this.questionModel.find({
+            _id: { $in: exercise.questionIDs }
+        });
     }
 }
