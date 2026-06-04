@@ -51,4 +51,10 @@ export class ExerciseProgressController {
     ) {
         return this.progressService.delete(id);
     }
+    @Get('user/:userId')
+    getProgressByUserId(
+        @Param('userId') userId: string,
+    ) {
+        return this.progressService.findByUserId(userId);
+    }
 }

@@ -32,10 +32,11 @@ export class ExerciseController {
     }
     @Get("findBy")
     async getExercises(
+        @Query('userId') userId?:string,
         @Query('level') level?: string,
         @Query('type') type?: string,
     ) {
-        return this.exerciseService.getExercises(level, type);
+        return this.exerciseService.getExercises(userId, level, type);
     }
     @Get(':id')
     findById(

@@ -60,7 +60,7 @@ export function ExerciseCard({ exercise }: ExerciseCardProps) {
             </div>
           </div>
           
-          {/*exercise.score !== undefined */ false && (
+          {exercise.completed && (
             <div className="flex items-center gap-1 text-green-600 font-semibold">
               <Star className="size-4 fill-current" />
               <span>{exercise.score}%</span>

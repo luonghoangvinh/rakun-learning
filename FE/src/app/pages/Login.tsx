@@ -51,7 +51,7 @@ const handleSubmit = async (e: React.FormEvent) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     // Clear error when user starts typing
     if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }));
+      setErrors(prev => ({ ...prev, [field]: 'k' }));
     }
   };
 
@@ -76,6 +76,7 @@ const handleSubmit = async (e: React.FormEvent) => {
             <button
               onClick={() => {
                 setIsLogin(true);
+                setFormData({ name: '', email: '', password: '', confirmPassword: '' });
                 setErrors({});
               }}
               className={`flex-1 py-2.5 rounded-lg font-semibold transition-all ${
@@ -89,6 +90,7 @@ const handleSubmit = async (e: React.FormEvent) => {
             <button
               onClick={() => {
                 setIsLogin(false);
+                setFormData({ name: '', email: '', password: '', confirmPassword: '' });
                 setErrors({});
               }}
               className={`flex-1 py-2.5 rounded-lg font-semibold transition-all ${
@@ -250,7 +252,10 @@ const handleSubmit = async (e: React.FormEvent) => {
         <p className="text-center text-white/80 text-sm mt-6">
           {isLogin ? "Chưa có tài khoản?" : "Đã có tài khoản?"}{' '}
           <button
-            onClick={() => setIsLogin(!isLogin)}
+            onClick={() => {
+              setIsLogin(!isLogin);
+              setFormData({ name: '', email: '', password: '', confirmPassword: '' });
+            }}
             className="font-semibold text-white hover:underline"
           >
             {isLogin ? "Đăng ký ngay" : "Đăng nhập"}

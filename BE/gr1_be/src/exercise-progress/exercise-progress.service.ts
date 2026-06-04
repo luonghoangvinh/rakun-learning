@@ -3,7 +3,7 @@ import {
     NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 
 import { ExerciseProgress } from './exercise-progress.entity';
 import { CreateExerciseProgressDto } from './dto/create-exercise-progress.dto';
@@ -17,6 +17,9 @@ export class ExerciseProgressService {
             Model<ExerciseProgress>,
     ) { }
 
+    async findByUserId(userId: string) {
+        return this.progressModel.find({userId: new Types.ObjectId(userId) }).exec();
+    }
     async create(
         dto: CreateExerciseProgressDto,
     ) {

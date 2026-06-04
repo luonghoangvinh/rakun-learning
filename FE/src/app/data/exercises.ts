@@ -1,6 +1,7 @@
 
 import { JLPTLevel, Question, QuestionType } from '../types';
 
+
 export interface Exercise {
   _id: string;
   title: string;
@@ -101,10 +102,10 @@ function getExerciseDescription(type: QuestionType, level: JLPTLevel, num: numbe
 
 export const allExercises = generateExercises();
 
-export function getExercisesByTypeAndLevel(type: QuestionType, level: JLPTLevel){
+export function getExercisesByTypeAndLevel(userId: string, type: QuestionType, level: JLPTLevel){
   const getExercises = async (type: QuestionType, level: JLPTLevel) => {
     try {
-      const exercises = await fetch(`/api/exercises/findBy?type=${type}&level=${level}`);
+      const exercises = await fetch(`/api/exercises/findBy?userId=${userId}&type=${type}&level=${level}`);
       const data: Exercise[] = await exercises.json();
       return data;
     } catch (error) {

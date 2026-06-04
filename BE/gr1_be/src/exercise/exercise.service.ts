@@ -3,12 +3,13 @@ import {
     NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 
 import { Exercise } from './exercise.entity';
 import { CreateExerciseDto } from './dto/create-exercise.dto';
 import { UpdateExerciseDto } from './dto/update-exercise.dto';
 import { Question } from '../question/question.entity';
+import { ExerciseProgress } from '../exercise-progress/exercise-progress.entity';
 
 @Injectable()
 export class ExerciseService {
@@ -18,7 +19,11 @@ export class ExerciseService {
 
         @InjectModel(Question.name)
         private readonly questionModel: Model<Question>,
+
+        @InjectModel(ExerciseProgress.name)
+        private readonly exerciseProgressModel: Model<ExerciseProgress>
     ) { }
+
 
     async create(dto: CreateExerciseDto) {
         return this.exerciseModel.create(dto);
@@ -76,9 +81,11 @@ export class ExerciseService {
 
 
     async getExercises(
+        userId?:string,
         level?: string,
         type?: string,
     ) {
+        let userProgress:ExerciseProgress[] = [];
         const filter: any = {};
 
         if (level) {
@@ -88,8 +95,17 @@ export class ExerciseService {
         if (type) {
             filter.type = type;
         }
-
-        return this.exerciseModel.find(filter);
+        if(userId){
+        userProgress= await this.exerciseProgressModel.find({ userId: new Types.ObjectId(userId) });
+        }
+        
+        const exercises = await this.exerciseModel.find(filter);
+        
+        return exercises.map(ex=>({
+            ...ex.toObject(),
+            completed: userProgress.some(p => p.exerciseId.equals(ex._id)),
+            score: userProgress.find(p => p.exerciseId.equals(ex._id))?.score ?? 0
+        }));
     }
     async getQuestionsByExerciseId(exerciseId: string) {
         const exercise = await this.exerciseModel.findById(exerciseId);

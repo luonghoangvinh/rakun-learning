@@ -15,6 +15,9 @@ export function PracticeList() {
   const [filterDifficulty, setFilterDifficulty] = useState<'all' | 'easy' | 'medium' | 'hard'>('all');
   const [showRandomExerciseModal, setShowRandomExerciseModal] = useState(false);
 
+  const userStr = localStorage.getItem('user');
+  const userData = userStr ? JSON.parse(userStr) : null;
+  const userId = userData ? userData.id : null;
   if (!type) {
     return <div>Không tìm thấy loại bài tập</div>;
   }
@@ -23,7 +26,7 @@ export function PracticeList() {
 
 useEffect(() => {
   const loadExercises = async () => {
-    const data = await getExercisesByTypeAndLevel(type as QuestionType, selectedLevel);
+    const data = await getExercisesByTypeAndLevel(userId || '', type as QuestionType, selectedLevel);
     setExercises(data);
   };
 
@@ -55,7 +58,7 @@ useEffect(() => {
   const handleStartRandomExercise = async (level: JLPTLevel) => {
     // Navigate to a random exercise for this type and level
     // For now, just navigate to the first exercise of this type/level
-    const levelExercises = await getExercisesByTypeAndLevel(type as QuestionType, level);
+    const levelExercises = await getExercisesByTypeAndLevel(userId || '', type as QuestionType, level);
     if (levelExercises.length > 0) {
       const randomIndex = Math.floor(Math.random() * levelExercises.length);
       navigate(`/practice-session/${levelExercises[randomIndex]._id}`);
