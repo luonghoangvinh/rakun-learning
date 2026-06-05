@@ -142,7 +142,7 @@ export function PracticeSession() {
     try {
       if (!exercise.completed) {
         //const res = await createNewExProgress(exerciseProgress);
-        const res = await updateExProgress(exercise.progressId ? exercise.progressId : '', exerciseProgress);
+        const res = await createNewExProgress(exerciseProgress);
       } else {
         const res = await updateExProgress(exercise.progressId ? exercise.progressId : '', exerciseProgress);
       }
