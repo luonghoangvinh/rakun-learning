@@ -100,6 +100,7 @@ export function PracticeSession() {
     setCorrectCount(prev => prev + (isCorrect ? 1 : 0));
 
     saveUserAnswer({
+      userId: userId,
       questionId: currentQuestion._id,
       type: currentQuestion.type,
       level: currentQuestion.level,

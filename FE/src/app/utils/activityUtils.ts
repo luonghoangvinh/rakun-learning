@@ -145,6 +145,7 @@ export function generateMockActivityData(): UserAnswer[] {
         answerTime.setMinutes(Math.floor(Math.random() * 60));
         
         mockAnswers.push({
+          userId:"",//
           questionId: `${exerciseId}-q${q}`,
           type,
           level,

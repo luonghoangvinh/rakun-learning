@@ -7,10 +7,22 @@ const STORAGE_KEYS = {
 };
 
 // User answers storage
-export function saveUserAnswer(answer: UserAnswer): void {
-  const answers = getUserAnswers();
-  answers.push(answer);
-  localStorage.setItem(STORAGE_KEYS.USER_ANSWERS, JSON.stringify(answers));
+export async function saveUserAnswer(answer: UserAnswer) {
+  try{
+    const data= await fetch("/api/user-answers",{
+      method:"POST",
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(answer),
+    })
+    return data;
+  }catch (err){
+    console.log(err);
+  }
+  //const answers = getUserAnswers();
+  //answers.push(answer);
+  //localStorage.setItem(STORAGE_KEYS.USER_ANSWERS, JSON.stringify(answers));
 }
 
 export function getUserAnswers(): UserAnswer[] {

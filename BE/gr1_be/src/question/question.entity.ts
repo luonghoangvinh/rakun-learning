@@ -23,6 +23,9 @@ export class Question {
     @Prop()
     imageURL?: string;
 
+    @Prop()
+    readingContent?: string;
+
     @Prop({ required: true })
     question!: string;
 

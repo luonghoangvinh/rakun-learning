@@ -53,6 +53,7 @@ export interface Deck {
 
 // User answer
 export interface UserAnswer {
+  userId:string;
   questionId: string;
   type: QuestionType;
   level: JLPTLevel;
