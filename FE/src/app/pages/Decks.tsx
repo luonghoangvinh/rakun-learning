@@ -20,7 +20,7 @@ export function Decks() {
   // Load decks from storage
   useEffect(() => {
     loadDecks();
-  }, []);
+  }, [personalDecks]);
   
   const loadDecks = async () => {
     const customDecks = await getDecks();
