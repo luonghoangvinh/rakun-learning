@@ -39,7 +39,7 @@ export interface Flashcard {
 
 // Flashcard deck
 export interface Deck {
-  id: string;
+  _id: string;
   name: string;
   description: string;
   cardCount: number;

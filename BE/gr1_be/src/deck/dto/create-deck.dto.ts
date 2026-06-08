@@ -1,5 +1,8 @@
 import {
     IsArray,
+    IsMongoId,
+    isMongoId,
+    isObject,
     IsOptional,
     IsString,
     ValidateNested,
@@ -10,6 +13,9 @@ import { Type } from 'class-transformer';
 import { CreateFlashcardDto } from '../../flashcard/dto/create-flashcard.dto';
 
 export class CreateDeckDto {
+
+    @IsMongoId()
+    userId!:string;
     @IsString()
     name!: string;
 
@@ -29,4 +35,7 @@ export class CreateDeckDto {
     @IsOptional()
     @IsString()
     icon?: string;
+
+    @IsString()
+    visibility!: string;
 }

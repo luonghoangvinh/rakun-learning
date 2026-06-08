@@ -119,7 +119,7 @@ export function DeckCard({ deck, onEdit, onDelete, onDuplicate, onExport, isCust
         </div>
       )}
       
-      <Link to={`/decks/${deck.id}`}>
+      <Link to={`/decks/${deck._id}`}>
         {/* Card header with gradient */}
         <div 
           className="p-6 group-hover:brightness-110 transition-all duration-300"

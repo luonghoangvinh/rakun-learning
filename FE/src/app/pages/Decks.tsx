@@ -22,8 +22,8 @@ export function Decks() {
     loadDecks();
   }, []);
   
-  const loadDecks = () => {
-    const customDecks = getDecks();
+  const loadDecks = async () => {
+    const customDecks = await getDecks();
     setPersonalDecks(customDecks);
   };
   
@@ -95,7 +95,7 @@ export function Decks() {
         deckData.visibility
       );
     } else if (editingDeck) {
-      updateDeck(editingDeck.id, deckData);
+      updateDeck(editingDeck._id, deckData);
     }
     loadDecks();
     setIsModalOpen(false);
@@ -134,9 +134,9 @@ export function Decks() {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (file) {
         const reader = new FileReader();
-        reader.onload = (event) => {
+        reader.onload = async (event) => {
           const jsonString = event.target?.result as string;
-          const imported = importDeck(jsonString);
+          const imported = await importDeck(jsonString);
           if (imported) {
             loadDecks();
             alert('Import thành công!');
@@ -222,13 +222,13 @@ export function Decks() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {currentDecks.map((deck) => (
               <DeckCard
-                key={deck.id}
+                key={deck._id}
                 deck={deck}
                 isCustom={selectedTab === 'personal'}
                 onEdit={selectedTab === 'personal' ? () => handleEditDeck(deck) : undefined}
-                onDelete={selectedTab === 'personal' ? () => handleDeleteDeck(deck.id) : undefined}
-                onDuplicate={selectedTab === 'personal' ? () => handleDuplicateDeck(deck.id) : undefined}
-                onExport={selectedTab === 'personal' ? () => handleExportDeck(deck.id) : undefined}
+                onDelete={selectedTab === 'personal' ? () => handleDeleteDeck(deck._id) : undefined}
+                onDuplicate={selectedTab === 'personal' ? () => handleDuplicateDeck(deck._id) : undefined}
+                onExport={selectedTab === 'personal' ? () => handleExportDeck(deck._id) : undefined}
               />
             ))}
           </div>
