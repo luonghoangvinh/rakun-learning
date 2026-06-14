@@ -1,8 +1,10 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { JLPTLevel } from "../exercise/exercise.entity";
+import { Types } from "mongoose";
 
-@Schema({ _id: false })
+@Schema()
 export class Flashcard {
+    _id!:Types.ObjectId;
     @Prop()
     front!: string;
 
@@ -12,7 +14,7 @@ export class Flashcard {
     @Prop({
         enum: ['vocabulary', 'grammar'],
     })
-    type!: string;
+    type?: string;
 
     @Prop({
         enum: JLPTLevel,

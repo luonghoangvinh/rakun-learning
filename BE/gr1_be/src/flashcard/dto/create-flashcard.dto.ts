@@ -13,10 +13,10 @@ export class CreateFlashcardDto {
     back!: string;
 
     @IsEnum(['vocabulary', 'grammar'])
-    type!: string;
+    type?: string;
 
     @IsEnum(JLPTLevel)
-    level!: JLPTLevel;
+    level?: JLPTLevel;
 
     @IsOptional()
     @IsString()

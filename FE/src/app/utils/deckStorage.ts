@@ -105,7 +105,15 @@ else return false;
 
 // Duplicate deck
 export async function duplicateDeck(id: string): Promise<Deck | null> {
-  const deck = await getDeckById(id);
+  const res= await fetch(`/api/decks/${id}/duplicate`,{
+    method:'POST',
+    headers:{
+      "Content-Type":"application/json"
+    }
+  })
+  const data=await res.json();
+  return data;
+  /*const deck = await getDeckById(id);
   if (!deck) return null;
 
   const newDeck: Deck = {
@@ -114,14 +122,14 @@ export async function duplicateDeck(id: string): Promise<Deck | null> {
     createdAt: new Date(),
     cards: deck.cards.map((card: Flashcard) => ({
       ...card,
-      id: `card-${Date.now()}-${Math.random()}`
+      id: new Types.ObjectId(),
     }))
   };
 
   const decks:Deck[] = await getDecks();
   decks.push(newDeck);
   saveDecks(decks);
-  return newDeck;
+  return newDeck;*/
 }
 
 // Add card to deck

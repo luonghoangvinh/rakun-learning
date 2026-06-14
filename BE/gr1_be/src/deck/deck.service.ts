@@ -20,6 +20,26 @@ export class DeckService {
         return this.deckModel.create(dto);
     }
 
+    async duplicate(id: string) {
+        const deck = await this.deckModel.findById(id);
+        const obj = deck?.toObject();
+        if (obj) {
+            const { _id, ...deckData } = obj;
+            const newDeck = {
+                ...deckData,
+                name: `${deckData.name} (copy)`,
+                createdAt: Date.now(),
+                cards: deckData.cards?.map(card => {
+                    const { _id, ...cardData } = card;
+                    return cardData;
+                }
+                )
+            }
+            return this.deckModel.create(newDeck);
+        }
+        return false;
+    }
+
     async findAll() {
         return this.deckModel.find().exec();
     }
@@ -40,7 +60,7 @@ export class DeckService {
     ) {
         const deck =
             await this.deckModel.findByIdAndUpdate(
-                {_id: new Types.ObjectId(id)},
+                { _id: new Types.ObjectId(id) },
                 dto,
                 { new: true },
             );
@@ -54,7 +74,7 @@ export class DeckService {
 
     async delete(id: string) {
         const deck =
-            await this.deckModel.findByIdAndDelete({_id: new Types.ObjectId(id)});
+            await this.deckModel.findByIdAndDelete({ _id: new Types.ObjectId(id) });
 
         if (!deck) {
             throw new NotFoundException('Deck not found');

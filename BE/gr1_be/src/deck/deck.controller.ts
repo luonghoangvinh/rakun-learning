@@ -3,6 +3,7 @@ import {
     Controller,
     Delete,
     Get,
+    NotFoundException,
     Param,
     Patch,
     Post,
@@ -23,6 +24,20 @@ export class DeckController {
         @Body() dto: CreateDeckDto,
     ) {
         return this.deckService.create(dto);
+    }
+
+
+    @Post(':id/duplicate')
+    async duplicate(
+        @Param('id') id: string,
+    ) {
+        const deck = await this.deckService.duplicate(id);
+
+    if (!deck) {
+        throw new NotFoundException('Deck not found');
+    }
+
+    return deck;
     }
 
 

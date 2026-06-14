@@ -109,7 +109,7 @@ export function Decks() {
   };
   
   const handleDuplicateDeck = async (deckId: string) => {
-    duplicateDeck(deckId);
+    await duplicateDeck(deckId);
     await loadDecks();
   };
   
