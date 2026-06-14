@@ -25,7 +25,7 @@ export class DeckService {
     }
 
     async findById(id: string) {
-        const deck = await this.deckModel.findById({_id: new Types.ObjectId(id)});
+        const deck = await this.deckModel.findById(id);
 
         if (!deck) {
             throw new NotFoundException('Deck not found');

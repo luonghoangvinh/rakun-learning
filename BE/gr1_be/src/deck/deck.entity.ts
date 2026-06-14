@@ -9,8 +9,6 @@ export class Deck {
     @Prop()
     description?: string;
 
-    @Prop()
-    cardCount?: number;
 
     @Prop({
         type: [FlashcardSchema],

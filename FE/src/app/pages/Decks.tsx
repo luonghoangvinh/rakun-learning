@@ -19,8 +19,8 @@ export function Decks() {
   
   // Load decks from storage
   useEffect(() => {
-    loadDecks();
-  }, [personalDecks]);
+  loadDecks();
+  }, []);
   
   const loadDecks = async () => {
     const customDecks = await getDecks();
@@ -85,9 +85,9 @@ export function Decks() {
     setIsModalOpen(true);
   };
   
-  const handleSaveDeck = (deckData: Partial<Deck>) => {
+  const handleSaveDeck = async (deckData: Partial<Deck>) => {
     if (modalMode === 'create') {
-      createDeck(
+      await createDeck(
         deckData.name!,
         deckData.description!,
         deckData.color,
@@ -95,22 +95,22 @@ export function Decks() {
         deckData.visibility
       );
     } else if (editingDeck) {
-      updateDeck(editingDeck._id, deckData);
+      await updateDeck(editingDeck._id, deckData);
     }
-    loadDecks();
+    await loadDecks();
     setIsModalOpen(false);
   };
   
-  const handleDeleteDeck = (deckId: string) => {
+  const handleDeleteDeck = async (deckId: string) => {
     if (confirm('Bạn có chắc chắn muốn xóa bộ thẻ này?')) {
       deleteDeck(deckId);
-      loadDecks();
+      await loadDecks();
     }
   };
   
-  const handleDuplicateDeck = (deckId: string) => {
+  const handleDuplicateDeck = async (deckId: string) => {
     duplicateDeck(deckId);
-    loadDecks();
+    await loadDecks();
   };
   
   const handleExportDeck = (deckId: string) => {
@@ -126,7 +126,7 @@ export function Decks() {
     }
   };
   
-  const handleImportDeck = () => {
+  const handleImportDeck = async () => {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.json';
@@ -138,7 +138,7 @@ export function Decks() {
           const jsonString = event.target?.result as string;
           const imported = await importDeck(jsonString);
           if (imported) {
-            loadDecks();
+            await loadDecks();
             alert('Import thành công!');
           } else {
             alert('Import thất bại. Vui lòng kiểm tra file JSON.');

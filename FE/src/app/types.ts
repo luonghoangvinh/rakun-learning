@@ -42,7 +42,6 @@ export interface Deck {
   _id: string;
   name: string;
   description: string;
-  cardCount: number;
   cards: Flashcard[];
   createdAt: Date;
   color?: string;

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { BookOpen, Calendar, Clock, MoreVertical, Edit, Trash2, Copy, Download, Eye } from 'lucide-react';
+import { Calendar, Clock, MoreVertical, Edit, Trash2, Copy, Download, Eye } from 'lucide-react';
 import { Deck } from '../types';
 import { useState, useRef, useEffect } from 'react';
 
@@ -130,7 +130,7 @@ export function DeckCard({ deck, onEdit, onDelete, onDuplicate, onExport, isCust
               {deck.icon || '📚'}
             </div>
             <div className="text-right">
-              <div className="text-3xl font-bold">{deck.cardCount}</div>
+              <div className="text-3xl font-bold">{deck.cards.length}</div>
               <div className="text-xs opacity-90">thẻ</div>
             </div>
           </div>

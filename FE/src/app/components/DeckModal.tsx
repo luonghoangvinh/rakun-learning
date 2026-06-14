@@ -106,7 +106,6 @@ export function DeckModal({ isOpen, onClose, onSave, deck, mode }: DeckModalProp
       color: selectedColor,
       icon: selectedIcon,
       cards: cards,
-      cardCount: cards.length
     });
 
     onClose();
