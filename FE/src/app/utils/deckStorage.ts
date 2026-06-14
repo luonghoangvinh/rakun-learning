@@ -13,19 +13,6 @@ export async function getDecks(){
   } catch(err){
     throw (err);
   }
-  //const clear= localStorage.removeItem(DECKS_STORAGE_KEY)
-  /*const stored = localStorage.getItem(DECKS_STORAGE_KEY);
-  if (!stored) return [];
-  try {
-    const decks = JSON.parse(stored);
-    // Convert createdAt strings back to Date objects
-    return decks.map((deck: any) => ({
-      ...deck,
-      createdAt: new Date(deck.createdAt)
-    }));
-  } catch {
-    return [];
-  }*/
 }
 
 // Get deck by ID
@@ -41,7 +28,7 @@ function saveDecks(decks: Deck[]) {
 }
 
 // Create new deck
-export async function createDeck(name: string, description: string, color?: string, icon?: string, visibility?: 'personal' | 'community') {
+export async function createDeck(name: string, description: string, cards:Flashcard[], color?: string, icon?: string, visibility?: 'personal' | 'community') {
   try {
     const newDeck = {
       //_id: `deck-${Date.now()}`,
@@ -49,7 +36,7 @@ export async function createDeck(name: string, description: string, color?: stri
       name,
       description,
       //cardCount: 0,
-      cards: [],
+      cards: cards||[],
       color: color || '#3B82F6',
       icon: icon || '📚',
       visibility: visibility || 'personal'
@@ -78,17 +65,6 @@ export async function updateDeck(id: string, updates: Partial<Deck>): Promise<bo
     },
     body: JSON.stringify(updates),
   })
-  /*const decks:Deck[] = await getDecks();
-  const index = decks.findIndex(deck => deck._id === id);
-  if (index === -1) return false;
-
-  decks[index] = {
-    ...decks[index],
-    ...updates,
-    _id: decks[index]._id, // Preserve ID
-    createdAt: decks[index].createdAt // Preserve creation date
-  };
-  saveDecks(decks);*/
   if(res.ok)
   return true;
 else return false;
@@ -113,23 +89,6 @@ export async function duplicateDeck(id: string): Promise<Deck | null> {
   })
   const data=await res.json();
   return data;
-  /*const deck = await getDeckById(id);
-  if (!deck) return null;
-
-  const newDeck: Deck = {
-    ...deck,
-    name: `${deck.name} (Copy)`,
-    createdAt: new Date(),
-    cards: deck.cards.map((card: Flashcard) => ({
-      ...card,
-      id: new Types.ObjectId(),
-    }))
-  };
-
-  const decks:Deck[] = await getDecks();
-  decks.push(newDeck);
-  saveDecks(decks);
-  return newDeck;*/
 }
 
 // Add card to deck
@@ -139,9 +98,7 @@ export async function addCardToDeck(deckId: string, card: Omit<Flashcard, 'id'>)
   if (deckIndex === -1) return false;
 
   const newCard: Flashcard = {
-    ...card,
-    id: `card-${Date.now()}-${Math.random()}`,
-    status: 'new'
+    ...card
   };
 
   decks[deckIndex].cards.push(newCard);
@@ -196,8 +153,8 @@ export async function duplicateCard(deckId: string, cardId: string): Promise<boo
 
   const newCard: Flashcard = {
     ...card,
-    id: `card-${Date.now()}-${Math.random()}`,
-    status: 'new'
+    //id: `card-${Date.now()}-${Math.random()}`,
+    //status: 'new'
   };
 
   return addCardToDeck(deckId, newCard);

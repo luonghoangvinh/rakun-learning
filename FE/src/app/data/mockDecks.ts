@@ -225,7 +225,7 @@ export const generateMockDecks = (): Deck[] => {
   ];
 
   return baseDecks.map((deck, index) => ({
-    id: `deck${index + 1}`,
+    _id: `deck${index + 1}`,
     name: deck.name,
     description: deck.description,
     cardCount: deck.cardCount,

@@ -10,7 +10,7 @@ interface CardModalProps {
   mode: 'create' | 'edit';
 }
 
-export function CardModal({ isOpen, onClose, onSave, card, mode }: CardModalProps) {
+export function CardModal({ isOpen, onClose, onSave, card, mode }: Readonly<CardModalProps>) {
   const [front, setFront] = useState('');
   const [back, setBack] = useState('');
   const [example, setExample] = useState('');
@@ -58,7 +58,7 @@ export function CardModal({ isOpen, onClose, onSave, card, mode }: CardModalProp
       example: example.trim(),
       type,
       level,
-      status: card?.status || 'new'
+      //status: card?.status || 'new'
     });
 
     onClose();

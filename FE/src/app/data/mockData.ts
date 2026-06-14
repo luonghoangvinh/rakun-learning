@@ -87,5 +87,5 @@ export function getQuestionsByType(type: string, level?: string): Question[] {
 
 // Get deck by id
 export function getDeckById(id: string): Deck | undefined {
-  return mockDecks.find(deck => deck.id === id);
+  return mockDecks.find(deck => deck._id === id);
 }

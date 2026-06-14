@@ -78,7 +78,7 @@ export function DeckModal({ isOpen, onClose, onSave, deck, mode }: DeckModalProp
     if (cardModalMode === 'create') {
       const newCard: Flashcard = {
         ...cardData,
-        id: `card-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+       // id: `card-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
       };
       setCards([...cards, newCard]);
     } else if (editingCard) {
@@ -335,7 +335,7 @@ export function DeckModal({ isOpen, onClose, onSave, deck, mode }: DeckModalProp
                       </button>
                       <button
                         type="button"
-                        onClick={() => handleDeleteCard(card.id)}
+                        onClick={() => handleDeleteCard(card?.id??"")}
                         className="p-2 hover:bg-red-50 text-red-600 rounded-lg transition-colors"
                         title="Xóa"
                       >

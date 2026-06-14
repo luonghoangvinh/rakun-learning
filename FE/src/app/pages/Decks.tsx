@@ -90,6 +90,7 @@ export function Decks() {
       await createDeck(
         deckData.name!,
         deckData.description!,
+        deckData.cards||[],
         deckData.color,
         deckData.icon,
         deckData.visibility

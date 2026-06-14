@@ -26,7 +26,7 @@ export interface Question {
 
 // Flashcard data
 export interface Flashcard {
-  id: string;
+  id?: string;
   front: string;
   back: string;
   type: 'vocabulary' | 'grammar';
