@@ -134,8 +134,9 @@ export function PracticeSession() {
     const timeSpent = Math.floor((Date.now() - startTime) / 1000);
 
     
-    if(exercise.difficulty==="easy")
-    setCorrectCount(prev => prev + (isCorrect ? 1 : 0));
+    if (isCorrect) {
+    setCorrectCount(prev => prev + 1);
+}
 
     saveUserAnswer({
       userId: userId,
