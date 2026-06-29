@@ -1,12 +1,12 @@
 import { useParams, useSearchParams, Link } from 'react-router-dom';
-import { CheckCircle, XCircle, Trophy, Clock, Target, TrendingUp, Home, RotateCcw } from 'lucide-react';
-import { Exercise, getExerciseById } from '../data/exercises';
+import { CheckCircle, XCircle, Trophy, Target, TrendingUp, Home, RotateCcw } from 'lucide-react';
+import { Exercise, getExerciseById } from '../utils/exercises';
 import { useEffect, useState } from 'react';
 
 export function PracticeResult() {
   const { exerciseId } = useParams<{ exerciseId: string }>();
   const [searchParams] = useSearchParams();
-  const score = parseInt(searchParams.get('score') || '0');
+  const score = Number.parseInt(searchParams.get('score') || '0');
   const [exercise, setExercise] = useState<Exercise | undefined>(undefined);
 
   const userStr = localStorage.getItem('user');
@@ -27,11 +27,9 @@ export function PracticeResult() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <div className="text-6xl mb-4">😢</div>
-          <p className="text-gray-600 text-lg mb-4">Không tìm thấy bài tập</p>
-          <Link to="/" className="text-blue-600 hover:underline">
-            ← Quay về trang chủ
-          </Link>
+          <div className="text-6xl mb-4">⏳</div>
+          <p className="text-gray-600 text-lg mb-4">Tính kết quả</p>
+          
         </div>
       </div>
     );
@@ -59,7 +57,7 @@ export function PracticeResult() {
   };
 
   const scoreInfo = getScoreMessage(score);
-  const totalQuestions = exercise.questionCount;
+  const totalQuestions = exercise.questionIDs.length;
   const correctAnswers = Math.round((score / 100) * totalQuestions);
   const incorrectAnswers = totalQuestions - correctAnswers;
 

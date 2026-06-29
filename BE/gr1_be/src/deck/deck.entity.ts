@@ -1,8 +1,16 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Flashcard, FlashcardSchema } from "../flashcard/flashcard.entity";
+import { Types } from "mongoose";
 
 @Schema()
 export class Deck {
+
+    @Prop({
+        type: Types.ObjectId,
+        ref: 'User',
+        required: true,
+    })
+    userId!: Types.ObjectId;
     @Prop()
     name!: string;
 

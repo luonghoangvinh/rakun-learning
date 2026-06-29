@@ -2,7 +2,6 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Types } from 'mongoose';
 import { User } from '../user/user.entity';
 import { Exercise } from '../exercise/exercise.entity';
-import { timestamp } from "rxjs";
 
 @Schema({ timestamps: true })
 export class ExerciseProgress {
@@ -21,6 +20,8 @@ export class ExerciseProgress {
   })
   exerciseId!: Types.ObjectId;
 
+  @Prop()
+  exerciseTitle!:string;
   @Prop({ default: Date.now })
   completeAt!: Date;
 

@@ -1,11 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, CheckCircle, XCircle, Clock, Flag, Pause, Play } from 'lucide-react';
-import { Question, JLPTLevel, QuestionType, ExerciseProgress } from '../types';
-import { getQuestionsByType } from '../data/mockData';
-import { Exercise, getExerciseById, getExercisesQuestion } from '../data/exercises';
+import { Question } from '../types';
+import { Exercise, getExerciseById, getExercisesQuestion } from '../utils/exercises';
 import { saveUserAnswer } from '../utils/storage';
-import createNewExProgress, { updateExProgress } from '../api/exProgress';
+import createNewExProgress, {updateExProgress } from '../utils/exProgress';
 
 export function PracticeSession() {
   const { exerciseId } = useParams<{ exerciseId: string }>();
@@ -85,7 +84,7 @@ export function PracticeSession() {
           setQuestions([]);
         }
       }
-      getQuestions(exerciseId ? exerciseId : '');
+      getQuestions(exerciseId??'');
     }
   }, [exercise]);
 
@@ -102,7 +101,7 @@ export function PracticeSession() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="text-6xl mb-4">😢</div>
+          <div className="text-6xl mb-4">📄</div>
           <p className="text-gray-600 text-lg mb-4">Không tìm thấy bài tập</p>
           <Link to="/" className="text-blue-600 hover:underline">
             ← Quay về trang chủ
@@ -133,6 +132,9 @@ export function PracticeSession() {
     // Save user answer
     const isCorrect = selectedAnswer === currentQuestion.correctAnswer;
     const timeSpent = Math.floor((Date.now() - startTime) / 1000);
+
+    
+    if(exercise.difficulty==="easy")
     setCorrectCount(prev => prev + (isCorrect ? 1 : 0));
 
     saveUserAnswer({
@@ -166,21 +168,28 @@ export function PracticeSession() {
   const handleFinish = async () => {
     let exerciseProgress: any = {};
 
-    const exScore = Math.round((correctCount / exercise.questionCount) * 100);
+    const exScore = Math.round((correctCount / exercise.questionIDs.length) * 100);
+    
+    let point = exScore;
+    if(exercise.difficulty==="medium") point=point*1.3;
+    else if(exercise.difficulty==="hard") point=point*1.5;
+
     if (userId) {
       exerciseProgress = {
         userId: userId,
         exerciseId: exerciseId,
-        totalQuestion: exercise.questionCount,
+        exerciseTitle:exercise.title,
+        totalQuestion: exercise.questionIDs.length,
         rightAnswer: correctCount,
-        score: exScore
+        score: exScore,
+        point: point,
       };
     }
     try {
       if (!exercise.completed) {
-        const res = await createNewExProgress(exerciseProgress);
+        await createNewExProgress(exerciseProgress);
       } else {
-        const res = await updateExProgress(exercise.progressId ? exercise.progressId : '', exerciseProgress);
+        await updateExProgress(exercise.progressId ? exercise.progressId : '', exerciseProgress);
       }
       navigate(`/practice-result/${exerciseId}?score=${exScore}`);
     } catch (error) {

@@ -3,11 +3,11 @@ import { Deck, Flashcard } from '../types';
 const DECKS_STORAGE_KEY = 'jlpt_decks';
 const userStr = localStorage.getItem('user');
 const userData = userStr ? JSON.parse(userStr) : null;
-const userId = userData ? userData.id : null;
+//const userId = userData ? userData.id : null;
 // Get all decks
-export async function getDecks(){
+export async function getDecks(id:string){
   try{
-    const res =await fetch("/api/decks")
+    const res =await fetch(`/api/decks/user/${id}`)
     const data=await res.json()
     return data;
   } catch(err){
@@ -28,7 +28,7 @@ function saveDecks(decks: Deck[]) {
 }
 
 // Create new deck
-export async function createDeck(name: string, description: string, cards:Flashcard[], color?: string, icon?: string, visibility?: 'personal' | 'community') {
+export async function createDeck(userId:string,name: string, description: string, cards:Flashcard[], color?: string, icon?: string, visibility?: 'personal' | 'community') {
   try {
     const newDeck = {
       //_id: `deck-${Date.now()}`,
@@ -41,6 +41,13 @@ export async function createDeck(name: string, description: string, cards:Flashc
       icon: icon || '📚',
       visibility: visibility || 'personal'
     };
+    newDeck.cards=newDeck.cards?.map(c=>{
+    if(c._id) {
+      const {_id,...card}=c;
+      return card;
+    }
+    else return c;
+})
     const res = await fetch("/api/decks",{
     method:"POST",
     headers:{
@@ -99,8 +106,8 @@ export async function duplicateDeck(id: string): Promise<Deck | null> {
 }
 
 // Add card to deck
-export async function addCardToDeck(deckId: string, card: Omit<Flashcard, 'id'>): Promise<boolean> {
-  const decks:Deck[] = await getDecks();
+export async function addCardToDeck(userId:string,deckId: string, card: Omit<Flashcard, 'id'>): Promise<boolean> {
+  const decks:Deck[] = await getDecks(userId);
   const deckIndex = decks.findIndex(d => d._id === deckId);
   if (deckIndex === -1) return false;
 
@@ -115,8 +122,8 @@ export async function addCardToDeck(deckId: string, card: Omit<Flashcard, 'id'>)
 }
 
 // Update card in deck
-export async function updateCard(deckId: string, cardId: string, updates: Partial<Flashcard>): Promise<boolean> {
-  const decks :Deck[]= await getDecks();
+export async function updateCard(userId:string,deckId: string, cardId: string, updates: Partial<Flashcard>): Promise<boolean> {
+  const decks :Deck[]= await getDecks(userId);
   const deckIndex = decks.findIndex(d => d._id === deckId);
   if (deckIndex === -1) return false;
 
@@ -134,9 +141,9 @@ export async function updateCard(deckId: string, cardId: string, updates: Partia
 }
 
 // Delete card from deck
-export async function deleteCard(deckId: string, cardId: string): Promise<boolean> {
+export async function deleteCard(userId:string,deckId: string, cardId: string): Promise<boolean> {
   
-  const decks:Deck[] = await getDecks();
+  const decks:Deck[] = await getDecks(userId);
   const deckIndex = decks.findIndex(d => d._id === deckId);
   if (deckIndex === -1) return false;
 
@@ -151,7 +158,7 @@ export async function deleteCard(deckId: string, cardId: string): Promise<boolea
 }
 
 // Duplicate card
-export async function duplicateCard(deckId: string, cardId: string): Promise<boolean> {
+export async function duplicateCard(userId:string,deckId: string, cardId: string): Promise<boolean> {
   const deck = await getDeckById(deckId);
   if (!deck) return false;
 
@@ -164,7 +171,7 @@ export async function duplicateCard(deckId: string, cardId: string): Promise<boo
     //status: 'new'
   };
 
-  return addCardToDeck(deckId, newCard);
+  return addCardToDeck(userId,deckId, newCard);
 }
 
 // Export deck to JSON
@@ -175,13 +182,13 @@ export function exportDeck(id: string): string | null {
 }
 
 // Import deck from JSON
-export async function importDeck(jsonString: string): Promise<Deck | null> {
+export async function importDeck(userId:string,jsonString: string): Promise<Deck | null> {
   try {
     const deck = JSON.parse(jsonString) as Deck;
     deck._id = `deck-${Date.now()}`;
     deck.createdAt = new Date();
 
-    const decks:Deck[] = await getDecks();
+    const decks:Deck[] = await getDecks(userId);
     decks.push(deck);
     saveDecks(decks);
     return deck;

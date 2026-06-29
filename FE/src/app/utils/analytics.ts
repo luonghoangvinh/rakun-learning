@@ -40,8 +40,24 @@ export function getAccuracyColor(accuracy: number): string {
   return 'text-red-600';
 }
 
-export function getRecentAnswers(answers: UserAnswer[], count: number = 10): UserAnswer[] {
-  return answers
-    .sort((a, b) => b.answeredAt.getTime() - a.answeredAt.getTime())
-    .slice(0, count);
+export function getTimeAgo(updatedAt: string | Date): string {
+  const now = new Date();
+  const updated = new Date(updatedAt);
+
+  const diffMs = now.getTime() - updated.getTime();
+
+  const minutes = Math.floor(diffMs / (1000 * 60));
+  const hours = Math.floor(diffMs / (1000 * 60 * 60));
+  const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+  if (minutes < 60) {
+    return `${minutes} phút trước`;
+  }
+
+  if (hours < 24) {
+    const remainingMinutes = minutes % 60;
+    return `${hours} giờ ${remainingMinutes} phút trước`;
+  }
+
+  return `${days} ngày trước`;
 }

@@ -4,13 +4,17 @@ import {
   User, Mail, Calendar, Trophy, Target, Zap, TrendingUp,
   Award, BookOpen, Settings, Edit2, Camera
 } from 'lucide-react';
-import { getUserAnswers } from '../utils/storage';
-import { calculateProgressStats } from '../utils/analytics';
+import { getUserAnswers, getUserStats } from '../utils/storage';
+import { ExerciseProgress } from '../types';
+import { getUserProgress } from '../utils/activityUtils';
+import { getTimeAgo } from '../utils/analytics';
 
-const userStr = localStorage.getItem('user');
-const userData = userStr ? JSON.parse(userStr) : null;
-const userId = userData ? userData.id : null;
+
+
 export function Profile() {
+  const userStr = localStorage.getItem('user');
+  const userData = userStr ? JSON.parse(userStr) : null;
+  const userId = userData ? userData.id : null;
   const [stats, setStats] = useState({
     totalQuestions: 0,
     correctAnswers: 0,
@@ -28,23 +32,36 @@ export function Profile() {
     avatar: ''
   });
 
-  useEffect(() => {
-    const getAnswers=async ()=>{
-    const res= await getUserAnswers(userId);
-    
-    const answers = await res.json();
-    const total = answers.length;
-    const correct = answers.filter((a: { isCorrect: any; }) => a.isCorrect).length;
-    const accuracy = total > 0 ? (correct / total) * 100 : 0;
+  const [activity, setActivity] = useState<ExerciseProgress[]>([]);
 
-    setStats(prev => ({
-      ...prev,
-      totalQuestions: total,
-      correctAnswers: correct,
-      accuracy
-    }));
-  }
-  getAnswers();
+  useEffect(() => {
+    setUserInfo({
+      name: userData?.userName ?? "Học viên JLPT",
+      email: userData?.gmail ?? "student@jlpt.com",
+      joinDate: userData?.createdTime??new Date('2024-01-15'),
+      avatar: ''
+    })
+    const getAnswers = async () => {
+      const res = await getUserAnswers(userId);
+
+      const answers = await res.json();
+      const [userPoint, userStreak] = await getUserStats(userId);
+      const total = answers.length;
+      const correct = answers.filter((a: { isCorrect: any; }) => a.isCorrect).length;
+      const accuracy = total > 0 ? (correct / total) * 100 : 0;
+      const acts = await getUserProgress(userId);
+      setActivity(acts);
+      setStats(prev => ({
+        ...prev,
+        totalQuestions: total,
+        correctAnswers: correct,
+        accuracy,
+        streak: userStreak,
+        points: userPoint,
+      }));
+    }
+
+    getAnswers();
   }, []);
 
   const achievements = [
@@ -91,8 +108,15 @@ export function Profile() {
     }
   ];
 
-  const joinDuration = Math.floor((new Date().getTime() - userInfo.joinDate.getTime()) / (1000 * 60 * 60 * 24));
-
+  const now = new Date();
+  const recentActivity: any[] = [];
+  activity.slice(0, 3).forEach(activity => {
+    recentActivity.push({
+      subject: activity?.exerciseTitle ?? "no title",
+      score: activity?.score ?? 0,
+      time: getTimeAgo(activity?.updatedAt ?? now)
+    })
+  })
   return (
     <div className="space-y-6">
       {/* Profile Header */}
@@ -130,7 +154,7 @@ export function Profile() {
                   </div>
                   <div className="flex items-center gap-2">
                     <Calendar className="size-4" />
-                    <span className="text-sm">Tham gia {joinDuration} ngày trước</span>
+                    <span className="text-sm">Tham gia {getTimeAgo(userInfo.joinDate)}</span>
                   </div>
                 </div>
               </div>
@@ -185,8 +209,8 @@ export function Profile() {
                 <div
                   key={achievement.id}
                   className={`p-4 rounded-xl border-2 transition-all ${achievement.unlocked
-                      ? 'bg-gradient-to-br from-yellow-50 to-orange-50 border-yellow-200'
-                      : 'bg-gray-50 border-gray-200 opacity-60'
+                    ? 'bg-gradient-to-br from-yellow-50 to-orange-50 border-yellow-200'
+                    : 'bg-gray-50 border-gray-200 opacity-60'
                     }`}
                 >
                   <div className="flex items-start gap-3">
@@ -241,18 +265,21 @@ export function Profile() {
               Hoạt động gần đây
             </h3>
             <div className="space-y-3">
-              {[
-                { type: 'Từ vựng', score: 95, time: '2 giờ trước', color: 'blue' },
-                { type: 'Ngữ pháp', score: 87, time: '5 giờ trước', color: 'green' },
-                { type: 'Nghe hiểu', score: 92, time: 'Hôm qua', color: 'purple' }
-              ].map((activity, index) => (
-                <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                  <div className={`size-10 rounded-lg flex items-center justify-center text-white bg-${activity.color}-500`}>
+              {recentActivity.length === 0 && (
+                <div>
+                  Chưa có hoạt động nào
+                </div>
+              )}
+              {recentActivity.map((activity, index) => (
+                <div key={index} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                  <div className={`size-10 rounded-lg flex items-center justify-center text-white flex-shrink-0 ${activity.score >= 90 ? 'bg-green-500' : activity.score >= 80 ? 'bg-blue-500' : 'bg-orange-500'
+                    }`}>
                     <span className="font-bold text-sm">{activity.score}</span>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium text-gray-900">{activity.type}</div>
-                    <div className="text-xs text-gray-500">{activity.time}</div>
+                    {/*<div className="text-xs text-gray-500 mb-1">{activity.type}</div>*/}
+                    <div className="text-sm font-medium text-gray-900 truncate">{activity.subject}</div>
+                    <div className="text-xs text-gray-500 mt-1">{activity.time}</div>
                   </div>
                 </div>
               ))}

@@ -17,7 +17,7 @@ interface DayActivityDetailProps {
   onClose?: () => void;
 }
 
-export function DayActivityDetail({ date, exercises, onClose }: DayActivityDetailProps) {
+export function DayActivityDetail({ date, exercises, onClose }: Readonly<DayActivityDetailProps>) {
   if (exercises.length === 0) {
     return (
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
@@ -33,7 +33,6 @@ export function DayActivityDetail({ date, exercises, onClose }: DayActivityDetai
   // Calculate totals
   const totalQuestions = exercises.reduce((sum, ex) => sum + ex.totalQuestions, 0);
   const totalCorrect = exercises.reduce((sum, ex) => sum + ex.correctAnswers, 0);
-  const totalIncorrect = totalQuestions - totalCorrect;
   const overallAccuracy = totalQuestions > 0 ? (totalCorrect / totalQuestions) * 100 : 0;
   const averageTime = exercises.reduce((sum, ex) => sum + ex.averageTime, 0) / exercises.length;
   

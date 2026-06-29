@@ -82,17 +82,22 @@ export interface QuestionCategory {
 export interface ExerciseProgress{
 
 
-  userId: String;
+  userId: string;
 
-  exerciseId: String;
+  exerciseId: string;
+
+  exerciseTitle:string;
 
   completeAt: Date;
 
+  updatedAt:Date;
+
   score: number;
 
-  
   totalQuestion: number;
 
   rightAnswer: number;
+
+  
 
 }

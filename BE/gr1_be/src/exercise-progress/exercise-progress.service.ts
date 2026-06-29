@@ -8,6 +8,7 @@ import { Model, Types } from 'mongoose';
 import { ExerciseProgress } from './exercise-progress.entity';
 import { CreateExerciseProgressDto } from './dto/create-exercise-progress.dto';
 import { UpdateExerciseProgressDto } from './dto/update-exercise-progress.dto';
+import { User } from '../user/user.entity';
 
 @Injectable()
 export class ExerciseProgressService {
@@ -15,24 +16,73 @@ export class ExerciseProgressService {
         @InjectModel(ExerciseProgress.name)
         private readonly progressModel:
             Model<ExerciseProgress>,
+        @InjectModel(User.name)
+        private readonly userModel: Model<User>,
     ) { }
+
+    private startOfDay(date: Date) {
+        const start = new Date(date);
+        start.setHours(0, 0, 0, 0);
+        return start;
+    }
+
+    private async updateUserPointAndStreak(userId: string, point: number) {
+        const user = await this.userModel.findById(userId);
+
+        if (!user) {
+            throw new NotFoundException('User not found');
+        }
+
+        const today = this.startOfDay(new Date());
+        const yesterday = new Date(today);
+        yesterday.setDate(today.getDate() - 1);
+
+        const lastStudyDate = user.lastStudyDate
+            ? this.startOfDay(user.lastStudyDate)
+            : null;
+
+        let newStreak = user.streak || 0;
+
+        if (!lastStudyDate) {
+            newStreak = 1;
+        } else if (lastStudyDate.getTime() === today.getTime()) {
+            newStreak = user.streak || 1;
+        } else if (lastStudyDate.getTime() === yesterday.getTime()) {
+            newStreak = (user.streak || 0) + 1;
+        } else {
+            newStreak = 1;
+        }
+
+        await this.userModel.findByIdAndUpdate(userId, {
+            $inc: { point },
+            $set: {
+                streak: newStreak,
+                lastStudyDate: new Date(),
+            },
+        });
+    }
+
     async findAll() {
         return this.progressModel.find().exec();
     }
 
     async findByUserId(userId: string) {
-        return this.progressModel.find({ userId: new Types.ObjectId(userId) }).exec();
+        return this.progressModel
+        .find({ userId: new Types.ObjectId(userId) })
+        .sort({ updatedAt: -1 })
+        .exec();
     }
 
-
-    async create(
-        dto: CreateExerciseProgressDto,
-    ) {
-        return this.progressModel.create({
+    async create(dto: CreateExerciseProgressDto) {
+        const progress = await this.progressModel.create({
             ...dto,
             userId: new Types.ObjectId(dto.userId),
             exerciseId: new Types.ObjectId(dto.exerciseId),
         });
+
+        await this.updateUserPointAndStreak(dto.userId, dto.point ?? dto.score);
+
+        return progress;
     }
 
     async findById(id: string) {
@@ -69,6 +119,12 @@ export class ExerciseProgressService {
             throw new NotFoundException(
                 'Progress not found',
             );
+        }
+
+        const point = dto.point ?? dto.score;
+
+        if (dto.userId && typeof point === 'number') {
+            await this.updateUserPointAndStreak(dto.userId, point);
         }
 
         return progress;

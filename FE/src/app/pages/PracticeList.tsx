@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Shuffle, TrendingUp, Award, Filter } from 'lucide-react';
 import { ExerciseCard } from '../components/ExerciseCard';
-import { Exercise, getExercisesByTypeAndLevel } from '../data/exercises';
+import { Exercise, getExercisesByTypeAndLevel } from '../utils/exercises';
 import { JLPTLevel, QuestionType } from '../types';
 import { Layout } from '../components/Layout';
 import { RandomExerciseModal } from '../components/RandomExerciseModal';
@@ -31,7 +31,7 @@ useEffect(() => {
   };
 
   loadExercises();
-}, [selectedLevel,filterDifficulty,type]);
+}, [ selectedLevel,filterDifficulty,type]);
   const filteredExercises = filterDifficulty === 'all'
     ? exercises
     : exercises.filter(ex => ex.difficulty === filterDifficulty);

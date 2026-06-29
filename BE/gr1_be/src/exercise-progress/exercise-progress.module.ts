@@ -5,6 +5,7 @@ import {
     ExerciseProgress,
     ExerciseProgressSchema,
 } from './exercise-progress.entity';
+import { User, UserSchema } from '../user/user.entity';
 import { ExerciseProgressController } from './exercise-progress.controller';
 import { ExerciseProgressService } from './exercise-progress.service';
 
@@ -14,6 +15,10 @@ import { ExerciseProgressService } from './exercise-progress.service';
             {
                 name: ExerciseProgress.name,
                 schema: ExerciseProgressSchema,
+            },
+            {
+                name: User.name,
+                schema: UserSchema,
             },
         ]),
     ],

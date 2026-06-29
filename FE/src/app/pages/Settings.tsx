@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import {
-  User, Mail, Lock, Bell, Palette, Globe, Volume2, Target,
+  User, Lock, Bell, Palette, Target,
   Shield, HelpCircle, LogOut, Save, ChevronRight
 } from 'lucide-react';
 

@@ -19,13 +19,9 @@ export async function saveUserAnswer(answer: UserAnswer) {
   }catch (err){
     console.log(err);
   }
-  //const answers = getUserAnswers();
-  //answers.push(answer);
-  //localStorage.setItem(STORAGE_KEYS.USER_ANSWERS, JSON.stringify(answers));
 }
 
 export async function getUserAnswers(userId:string) {
-  //const data = localStorage.getItem(STORAGE_KEYS.USER_ANSWERS);
   try{
     const res= await fetch(`/api/user-answers/user/${userId}`)
     return res;
@@ -33,19 +29,20 @@ export async function getUserAnswers(userId:string) {
     console.log(err);
     throw("lỗi getUserAnswers");
   }
-  //if (!data) return [];
-  
-  //const answers = JSON.parse(data);
-  // Convert date strings back to Date objects
-  //return answers.map((a: any) => ({
-   // ...a,
-   // answeredAt: new Date(a.answeredAt)
-  //}));
+}
+
+export async function getUserStats(userId: string){
+  const res= await fetch(`/api/users/${userId}`);
+  const userData=await res.json();
+
+  return [userData.point,userData.streak];
 }
 
 export function clearUserAnswers(): void {
   localStorage.removeItem(STORAGE_KEYS.USER_ANSWERS);
 }
+
+
 
 // Custom decks storage
 export function saveCustomDeck(deck: Deck): void {
@@ -79,27 +76,3 @@ export function deleteCustomDeck(deckId: string): void {
   localStorage.setItem(STORAGE_KEYS.CUSTOM_DECKS, JSON.stringify(filtered));
 }
 
-// Saved cards storage
-export function saveCard(deckId: string, cardId: string): void {
-  const saved = getSavedCards();
-  if (!saved[deckId]) {
-    saved[deckId] = [];
-  }
-  if (!saved[deckId].includes(cardId)) {
-    saved[deckId].push(cardId);
-  }
-  localStorage.setItem(STORAGE_KEYS.SAVED_CARDS, JSON.stringify(saved));
-}
-
-export function getSavedCards(): Record<string, string[]> {
-  const data = localStorage.getItem(STORAGE_KEYS.SAVED_CARDS);
-  return data ? JSON.parse(data) : {};
-}
-
-export function removeSavedCard(deckId: string, cardId: string): void {
-  const saved = getSavedCards();
-  if (saved[deckId]) {
-    saved[deckId] = saved[deckId].filter(id => id !== cardId);
-  }
-  localStorage.setItem(STORAGE_KEYS.SAVED_CARDS, JSON.stringify(saved));
-}

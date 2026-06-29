@@ -12,7 +12,7 @@ interface DeckCardProps {
   isCustom?: boolean;
 }
 
-export function DeckCard({ deck, onEdit, onDelete, onDuplicate, onExport, isCustom = false }: DeckCardProps) {
+export function DeckCard({ deck, onEdit, onDelete, onDuplicate, onExport, isCustom = false }: Readonly<DeckCardProps>) {
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   
@@ -129,7 +129,7 @@ export function DeckCard({ deck, onEdit, onDelete, onDuplicate, onExport, isCust
             <div className="bg-white/20 backdrop-blur-sm rounded-lg p-3 text-2xl">
               {deck.icon || '📚'}
             </div>
-            <div className="text-right">
+            <div className="text-right translate-y-5">
               <div className="text-3xl font-bold">{deck.cards.length}</div>
               <div className="text-xs opacity-90">thẻ</div>
             </div>
@@ -159,17 +159,19 @@ export function DeckCard({ deck, onEdit, onDelete, onDuplicate, onExport, isCust
             )}
           </div>
           
+          
           {/* Progress bar */}
+          
           <div className="space-y-2">
-            <div className="flex items-center justify-between text-xs">
+            {/*<div className="flex items-center justify-between text-xs">
               <span className="text-gray-600 font-medium">Tiến độ học tập</span>
               <span className="text-blue-600 font-semibold">45%</span>
-            </div>
+            </div>*/}
             <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
-              <div 
+              <div
                 className="h-full rounded-full transition-all duration-300"
-                style={{ 
-                  width: '45%',
+                style={{
+                  width: '100%',
                   backgroundColor: bgColor
                 }}
               ></div>

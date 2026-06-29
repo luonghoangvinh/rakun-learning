@@ -9,7 +9,7 @@ interface LayoutProps {
   onLevelChange?: (level: JLPTLevel) => void;
 }
 
-export function Layout({ children, selectedLevel, onLevelChange }: LayoutProps) {
+export function Layout({ children, selectedLevel, onLevelChange }: Readonly<LayoutProps>) {
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -82,7 +82,7 @@ export function Layout({ children, selectedLevel, onLevelChange }: LayoutProps) 
               <>
                 <Link to="/" className="flex items-center gap-2">
                   
-                  <span className="font-bold text-gray-900">JLPT Study</span>
+                  <span className="font-bold text-gray-900">Rakun JLPT</span>
                 </Link>
                 <button
                   onClick={() => setSidebarOpen(false)}
@@ -182,7 +182,7 @@ export function Layout({ children, selectedLevel, onLevelChange }: LayoutProps) 
                     <div className="text-sm font-medium text-gray-900 truncate">
                       {user?.userName || 'Học viên'}
                     </div>
-                    <div className="text-xs text-gray-500">JLPT N4</div>
+                    {/*<div className="text-xs text-gray-500">JLPT N4</div>*/}
                   </div>
                 </Link>
               </div>
@@ -236,7 +236,7 @@ export function Layout({ children, selectedLevel, onLevelChange }: LayoutProps) 
             )}
             
             {/* Search */}
-            <div className="hidden lg:block relative">
+            {/*<div className="hidden lg:block relative">
               <input
                 type="text"
                 placeholder="Tìm kiếm..."
@@ -245,7 +245,7 @@ export function Layout({ children, selectedLevel, onLevelChange }: LayoutProps) 
               <svg className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
-            </div>
+            </div>*/}
             
             {/* Notifications */}
             <button className="relative p-2 hover:bg-gray-50 rounded-lg transition-colors">

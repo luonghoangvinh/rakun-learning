@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Mail, Lock, Phone, User, Eye, EyeOff } from 'lucide-react';
-import { login, signup } from '../api/authApi';
+import { Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
+import { login, signup } from '../utils/authApi';
 
 export function Login() {
   const navigate = useNavigate();
@@ -17,35 +17,37 @@ export function Login() {
 
 
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-  try {
-    if (isLogin) {
-      const res = await login({
-        gmail: formData.email,
-        password: formData.password,
-      });
-      
-      localStorage.setItem('token', res.access_token);
-      localStorage.setItem('user', JSON.stringify(res.user));
-      
-    } else {
-      await signup({
-        userName: formData.name,
-        gmail: formData.email,
-        password: formData.password,
+    try {
+      if (isLogin) {
+        const res = await login({
+          gmail: formData.email,
+          password: formData.password,
+        });
+
+        localStorage.setItem('token', res.access_token);
+        localStorage.setItem('user', JSON.stringify(res.user));
+
+      } else {
+        await signup({
+          userName: formData.name,
+          gmail: formData.email,
+          password: formData.password,
+        });
+        setIsLogin(true);
+        return;
+      }
+
+      navigate('/');
+    } catch (err: any) {
+      setErrors({
+        email: err.message || 'Đăng nhập thất bại',
+
       });
     }
-
-    navigate('/');
-  } catch (err: any) {
-    setErrors({
-      email: err.message || 'Đăng nhập thất bại',
-    
-    });
-  }
-};
+  };
 
   const handleChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -61,7 +63,7 @@ const handleSubmit = async (e: React.FormEvent) => {
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-3 bg-white/10 backdrop-blur-md rounded-2xl px-6 py-3 mb-4">
-            
+
             <span className="text-2xl font-bold text-white">JLPT Study</span>
           </div>
           <p className="text-white/90 text-lg">
@@ -79,11 +81,10 @@ const handleSubmit = async (e: React.FormEvent) => {
                 setFormData({ name: '', email: '', password: '', confirmPassword: '' });
                 setErrors({});
               }}
-              className={`flex-1 py-2.5 rounded-lg font-semibold transition-all ${
-                isLogin
-                  ? 'bg-white text-blue-600 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
+              className={`flex-1 py-2.5 rounded-lg font-semibold transition-all ${isLogin
+                ? 'bg-white text-blue-600 shadow-sm'
+                : 'text-gray-600 hover:text-gray-900'
+                }`}
             >
               Đăng nhập
             </button>
@@ -93,11 +94,10 @@ const handleSubmit = async (e: React.FormEvent) => {
                 setFormData({ name: '', email: '', password: '', confirmPassword: '' });
                 setErrors({});
               }}
-              className={`flex-1 py-2.5 rounded-lg font-semibold transition-all ${
-                !isLogin
-                  ? 'bg-white text-blue-600 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
+              className={`flex-1 py-2.5 rounded-lg font-semibold transition-all ${!isLogin
+                ? 'bg-white text-blue-600 shadow-sm'
+                : 'text-gray-600 hover:text-gray-900'
+                }`}
             >
               Đăng ký
             </button>
@@ -117,9 +117,8 @@ const handleSubmit = async (e: React.FormEvent) => {
                     value={formData.name}
                     onChange={(e) => handleChange('name', e.target.value)}
                     placeholder="Nguyễn Văn A"
-                    className={`w-full pl-11 pr-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
-                      errors.name ? 'border-red-500' : 'border-gray-200'
-                    }`}
+                    className={`w-full pl-11 pr-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${errors.name ? 'border-red-500' : 'border-gray-200'
+                      }`}
                   />
                 </div>
                 {errors.name && (
@@ -140,9 +139,8 @@ const handleSubmit = async (e: React.FormEvent) => {
                   value={formData.email}
                   onChange={(e) => handleChange('email', e.target.value)}
                   placeholder="example@gmail.com"
-                  className={`w-full pl-11 pr-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
-                    errors.email ? 'border-red-500' : 'border-gray-200'
-                  }`}
+                  className={`w-full pl-11 pr-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${errors.email ? 'border-red-500' : 'border-gray-200'
+                    }`}
                 />
               </div>
               {errors.email && (
@@ -163,9 +161,8 @@ const handleSubmit = async (e: React.FormEvent) => {
                   value={formData.password}
                   onChange={(e) => handleChange('password', e.target.value)}
                   placeholder="••••••••"
-                  className={`w-full pl-11 pr-11 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
-                    errors.password ? 'border-red-500' : 'border-gray-200'
-                  }`}
+                  className={`w-full pl-11 pr-11 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${errors.password ? 'border-red-500' : 'border-gray-200'
+                    }`}
                 />
                 <button
                   type="button"
@@ -197,9 +194,8 @@ const handleSubmit = async (e: React.FormEvent) => {
                     value={formData.confirmPassword}
                     onChange={(e) => handleChange('confirmPassword', e.target.value)}
                     placeholder="••••••••"
-                    className={`w-full pl-11 pr-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
-                      errors.confirmPassword ? 'border-red-500' : 'border-gray-200'
-                    }`}
+                    className={`w-full pl-11 pr-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${errors.confirmPassword ? 'border-red-500' : 'border-gray-200'
+                      }`}
                   />
                 </div>
                 {errors.confirmPassword && (

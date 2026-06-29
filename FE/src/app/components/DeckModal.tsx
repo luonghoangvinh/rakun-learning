@@ -24,7 +24,7 @@ const DECK_COLORS = [
 
 const DECK_ICONS = ['📚', '📖', '📝', '✏️', '📕', '📗', '📘', '📙', '🎯', '⭐', '🌟', '💡', '🔥', '🎓', '📌', '🏆'];
 
-export function DeckModal({ isOpen, onClose, onSave, deck, mode }: DeckModalProps) {
+export function DeckModal({ isOpen, onClose, onSave, deck, mode }: Readonly<DeckModalProps>) {
   const [activeTab, setActiveTab] = useState<'info' | 'cards'>('info');
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -78,11 +78,11 @@ export function DeckModal({ isOpen, onClose, onSave, deck, mode }: DeckModalProp
     if (cardModalMode === 'create') {
       const newCard: Flashcard = {
         ...cardData,
-       // id: `card-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+      _id: `card-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
       };
       setCards([...cards, newCard]);
     } else if (editingCard) {
-      setCards(cards.map(c => c._id === editingCard._id ? { ...cardData, id: c._id } : c));
+      setCards(cards.map(c => c._id === editingCard._id ? { ...cardData, _id: c._id } : c));
     }
     setIsCardModalOpen(false);
   };

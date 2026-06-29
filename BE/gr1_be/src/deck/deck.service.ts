@@ -17,7 +17,10 @@ export class DeckService {
     ) { }
 
     async create(dto: CreateDeckDto) {
-        return this.deckModel.create(dto);
+        return this.deckModel.create({
+            ...dto,
+            userId: new Types.ObjectId(dto.userId),
+        });
     }
 
     async duplicate(id: string) {
@@ -54,6 +57,15 @@ export class DeckService {
         return deck;
     }
 
+
+    async findByUserId(userId: string) {
+        const decks = await this.deckModel.find({
+            userId: new Types.ObjectId(userId),
+        });
+
+        return decks;
+    }
+
     async update(
         id: string,
         dto: UpdateDeckDto,
@@ -62,7 +74,9 @@ export class DeckService {
             await this.deckModel.findByIdAndUpdate(
                 { _id: new Types.ObjectId(id) },
                 dto,
-                { new: true },
+                {
+                    returnDocument: 'after',
+                },
             );
 
         if (!deck) {

@@ -1,33 +1,24 @@
 import { useState, useEffect } from 'react';
-import { TrendingUp, TrendingDown, Clock, CheckCircle, XCircle, Calendar as CalendarIcon } from 'lucide-react';
+import { TrendingUp, TrendingDown, Clock, CheckCircle } from 'lucide-react';
 import { getUserAnswers } from '../utils/storage';
 import { calculateProgressStats, getTypeTitle, getAccuracyColor } from '../utils/analytics';
-import { getActivityByDate, getExercisesForDate, generateMockActivityData } from '../utils/activityUtils';
+
 import { ProgressStats } from '../types';
-import { ActivityCalendar } from '../components/ActivityCalendar';
-import { DayActivityDetail } from '../components/DayActivityDetail';
-import { data } from 'react-router-dom';
+
 
 export function Progress() {
   const [stats, setStats] = useState<ProgressStats[]>([]);
   const [totalQuestions, setTotalQuestions] = useState(0);
   const [overallAccuracy, setOverallAccuracy] = useState(0);
-  const [selectedDate, setSelectedDate] = useState<string | undefined>();
-  const [showCalendar, setShowCalendar] = useState(false);
 
   const userStr = localStorage.getItem('user');
   const userData = userStr ? JSON.parse(userStr) : null;
   const userId = userData ? userData.id : null;
   useEffect(() => {
-    // Get real answers or use mock data for demo
     const getAnswers = async () => {
       const res = await getUserAnswers(userId);
       const answers =await res.json();
 
-      // If no real data, use mock data for demonstration
-      /*if (answers.length === 0) {
-        answers = generateMockActivityData();
-      }*/
 
       const calculatedStats = calculateProgressStats(answers);
       setStats(calculatedStats);
@@ -40,11 +31,14 @@ export function Progress() {
     getAnswers();
   }, []);
 
+  
+
+  /*
   const handleDayClick = (date: string) => {
     setSelectedDate(date);
   };
-
-  /*const activities = getActivityByDate(
+  
+  const activities = getActivityByDate(
     getUserAnswers(userId).length > 0 ? getUserAnswers(userId) : generateMockActivityData()
   );
 
@@ -179,29 +173,6 @@ export function Progress() {
         </div>
       </div>
 
-      {/* Recommendations */}
-      {/*<div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl border border-blue-200 p-6">
-        <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-          <span>💡</span>
-          Gợi ý cải thiện
-        </h3>
-        <ul className="space-y-2">
-          {stats
-            .filter(s => s.accuracy < 70 && s.total > 0)
-            .map(s => (
-              <li key={s.type} className="text-sm text-gray-700">
-                • Tập trung luyện tập <strong>{getTypeTitle(s.type)}</strong> để nâng cao độ chính xác
-              </li>
-            ))
-          }
-          {stats.every(s => s.accuracy >= 70 || s.total === 0) && (
-            <li className="text-sm text-gray-700">
-              • Tuyệt vời! Hãy tiếp tục duy trì và thử thách bản thân với cấp độ cao hơn
-            </li>
-          )}
-        </ul>
-      </div>
-      */}
 
       {/* Activity Calendar */}
       {/*

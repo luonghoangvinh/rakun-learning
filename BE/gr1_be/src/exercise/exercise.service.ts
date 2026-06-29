@@ -10,7 +10,6 @@ import { CreateExerciseDto } from './dto/create-exercise.dto';
 import { UpdateExerciseDto } from './dto/update-exercise.dto';
 import { Question } from '../question/question.entity';
 import { ExerciseProgress } from '../exercise-progress/exercise-progress.entity';
-import { types } from 'util';
 
 @Injectable()
 export class ExerciseService {
@@ -37,18 +36,12 @@ export class ExerciseService {
     async findById(id: string) {
         const exercise =
             await this.exerciseModel.findById(id);
-        //const userProgress = await this.exerciseProgressModel.find({ userId: new Types.ObjectId(userId) });
         if (!exercise) {
             throw new NotFoundException(
                 'Exercise not found',
             );
         }
 
-        /*return {
-            ...exercise,
-            completed: userProgress.some(p => p.exerciseId.equals(exercise._id)),
-            progressId: userProgress.find(p => p.exerciseId.equals(exercise._id))?._id??""
-        };*/
         return exercise;
     }
 

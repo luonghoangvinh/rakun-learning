@@ -26,6 +26,12 @@ export class User {
 
     @Prop({ default: 0 })
     point!: number;
+
+    @Prop({ default: 0 })
+    streak!: number;
+
+    @Prop()
+    lastStudyDate?: Date;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

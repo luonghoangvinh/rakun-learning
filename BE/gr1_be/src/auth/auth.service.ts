@@ -12,8 +12,8 @@ import { User, UserDocument } from '../user/user.entity';
 @Injectable()
 export class AuthService {
     constructor(
-        @InjectModel(User.name) private userModel: Model<UserDocument>,
-        private jwtService: JwtService,
+        @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
+        private readonly jwtService: JwtService,
     ) { }
 
     // REGISTER
@@ -56,6 +56,7 @@ export class AuthService {
         const payload = {
             sub: user._id,
             gmail: user.gmail,
+            userName: user.userName,
         };
 
         return {
@@ -66,10 +67,13 @@ export class AuthService {
                 userName: user.userName,
                 gmail: user.gmail,
 
-                // các field stats của bạn
+                // các field stats
                 totalQuestion: user.totalQuestion,
                 rightAnswer: user.rightAnswer,
                 point: user.point,
+                streak: user.streak,
+                lastStudyDate: user.lastStudyDate,
+                createdTime:user.createdTime,
             },
         };
     }

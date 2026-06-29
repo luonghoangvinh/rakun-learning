@@ -5,7 +5,7 @@ import { JLPTLevel, Question, QuestionType } from '../types';
 export interface Exercise {
   _id: string;
   title: string;
-  //questionIDs: string[]; // List of question IDs associated with this exercise
+  questionIDs: string[]; // List of question IDs associated with this exercise
   description: string;
   type: QuestionType;
   level: JLPTLevel;
@@ -21,8 +21,6 @@ export interface Exercise {
 export const generateExercises = (): Exercise[] => {
   const exercises: Exercise[] = [];
 
-  const types: QuestionType[] = ['vocabulary', 'grammar', 'listening', 'reading'];
-  const levels: JLPTLevel[] = ['N5', 'N4', 'N3', 'N2', 'N1'];
 
   return exercises;
 };
@@ -43,40 +41,6 @@ function getTypeName(type: QuestionType): string {
   return names[type];
 }
 
-function getExerciseDescription(type: QuestionType, level: JLPTLevel, num: number): string {
-  const descriptions: Record<QuestionType, string[]> = {
-    vocabulary: [
-      'Luyện tập từ vựng cơ bản',
-      'Từ vựng theo chủ đề',
-      'Phân biệt từ đồng nghĩa',
-      'Kanji và cách đọc',
-      'Từ vựng nâng cao'
-    ],
-    grammar: [
-      'Ngữ pháp cơ bản',
-      'Cấu trúc câu phức tạp',
-      'Trợ từ và liên từ',
-      'Thể kính ngữ',
-      'Ngữ pháp nâng cao'
-    ],
-    listening: [
-      'Nghe hội thoại đơn giản',
-      'Nghe thông báo',
-      'Nghe hiểu chi tiết',
-      'Nghe và trả lời câu hỏi',
-      'Nghe hiểu nâng cao'
-    ],
-    reading: [
-      'Đọc đoạn văn ngắn',
-      'Hiểu ý chính',
-      'Đọc hiểu chi tiết',
-      'Đọc báo và bài báo',
-      'Đọc văn bản phức tạp'
-    ]
-  };
-
-  return descriptions[type][(num - 1) % descriptions[type].length];
-}
 
 
 export function getExercisesByTypeAndLevel(userId: string, type: QuestionType, level: JLPTLevel){
@@ -97,7 +61,6 @@ export function getExercisesByTypeAndLevel(userId: string, type: QuestionType, l
 
 export async function getExerciseById(userId: string, id: string): Promise<Exercise | undefined> {
   try{
-    //const exercise = await fetch(`/api/exercises/${id}?userId=${userId}`);
     const exercise = await fetch(`/api/exercises/ByUserIandId?id=${id}&userId=${userId}`);
     const data: Exercise = await exercise.json();
     return data;

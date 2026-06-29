@@ -28,11 +28,11 @@ export function FlashcardView() {
     return <div>Đang tải...</div>;
   }
 
-  if (!deck) {
+  if (!deck||deck.cards.length===0) {
     return (
       <div className="text-center py-12">
-        <div className="text-4xl mb-4">😢</div>
-        <p className="text-gray-600">Không tìm thấy deck</p>
+        <div className="text-4xl mb-4">📄</div>
+        <p className="text-gray-600">Không tìm thấy thẻ nào</p>
         <Link to="/decks" className="text-blue-600 hover:underline mt-4 inline-block">
           ← Quay lại danh sách deck
         </Link>

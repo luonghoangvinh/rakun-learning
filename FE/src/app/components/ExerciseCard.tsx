@@ -1,12 +1,12 @@
 import { Link } from 'react-router-dom';
 import { Clock, FileText, CheckCircle, Star, TrendingUp } from 'lucide-react';
-import { Exercise } from '../data/exercises';
+import { Exercise } from '../utils/exercises';
 
 interface ExerciseCardProps {
   exercise: Exercise;
 }
 
-export function ExerciseCard({ exercise }: ExerciseCardProps) {
+export function ExerciseCard({ exercise }: Readonly<ExerciseCardProps>) {
   const difficultyColors = {
     easy: 'bg-green-100 text-green-700 border-green-200',
     medium: 'bg-yellow-100 text-yellow-700 border-yellow-200',
@@ -72,7 +72,7 @@ export function ExerciseCard({ exercise }: ExerciseCardProps) {
       <div className="bg-gray-50 px-6 py-3 border-t border-gray-100 group-hover:bg-blue-50 transition-colors">
         <div className="text-sm font-medium text-gray-700 group-hover:text-blue-700 flex items-center justify-between">
           <span>{exercise.completed ? 'Làm lại bài tập' : 'Bắt đầu luyện tập'} →</span>
-          {exercise.completed && exercise.score && exercise.score < 80 && (
+          {exercise.completed &&(exercise.score||exercise.score===0)&& exercise.score < 80 && (
             <span className="text-xs text-orange-600 flex items-center gap-1">
               <TrendingUp className="size-3" />
               Cải thiện điểm

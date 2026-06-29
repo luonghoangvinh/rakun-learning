@@ -1,11 +1,13 @@
-import { Link } from 'react-router-dom';
-import { Target, Zap, Trophy, TrendingUp, Clock, Award, BookOpen, Brain, Headphones, FileText, ArrowRight, Calendar } from 'lucide-react';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { Target, Zap, Trophy, Clock, Award, BookOpen, Brain, Headphones, FileText, ArrowRight } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { getUserAnswers } from '../utils/storage';
-import { calculateProgressStats } from '../utils/analytics';
+import { getUserAnswers, getUserStats } from '../utils/storage';
 import { MiniTestModal } from '../components/MiniTestModal';
 import { QuizModal } from '../components/QuizModal';
 import { JLPTTestModal } from '../components/JLPTTestModal';
+import { getUserProgress } from '../utils/activityUtils';
+import { ExerciseProgress } from '../types';
+import { getTimeAgo } from '../utils/analytics';
 
 export function Home() {
   const [stats, setStats] = useState({
@@ -15,33 +17,42 @@ export function Home() {
     points: 1250,
     level: 'N4'
   });
-  
+  const [activity, setActivity] = useState<ExerciseProgress[]>([]);
   const [showMiniTestModal, setShowMiniTestModal] = useState(false);
   const [showQuizModal, setShowQuizModal] = useState(false);
   const [showJLPTTestModal, setShowJLPTTestModal] = useState(false);
-  
+  const navigate = useNavigate();
   const userStr = localStorage.getItem('user');
   const userData = userStr ? JSON.parse(userStr) : null;
   const userId = userData ? userData.id : null;
-  
+
+
+
   useEffect(() => {
-    const getAnswers= async ()=>{
-    const res = await getUserAnswers(userId);
-    const answers= await res.json();
-    const progressStats = calculateProgressStats(answers);
-    const total = answers.length;
-    const correct = answers.filter((a: { isCorrect: any; }) => a.isCorrect).length;
-    const accuracy = total > 0 ? (correct / total) * 100 : 0;
-    
-    setStats(prev => ({
-      ...prev,
-      totalQuestions: total,
-      accuracy
-    }));
+    if (!userId) navigate('/login');
+    else {
+    const getAnswers = async () => {
+      const res = await getUserAnswers(userId);
+      const [userPoint, userStreak] = await getUserStats(userId);
+      const answers = await res.json();
+      const total = answers.length;
+      const correct = answers.filter((a: { isCorrect: any; }) => a.isCorrect).length;
+      const accuracy = total > 0 ? (correct / total) * 100 : 0;
+
+      const acts = await getUserProgress(userId);
+      setActivity(acts);
+      setStats(prev => ({
+        ...prev,
+        totalQuestions: total,
+        accuracy,
+        streak: userStreak,
+        points: userPoint,
+      }));
+    }
+    getAnswers();
   }
-  getAnswers();
   }, []);
-  
+
   const quickStats = [
     {
       label: 'Câu hỏi đã làm',
@@ -72,7 +83,7 @@ export function Home() {
       change: ''
     }
   ];
-  
+
   const learningModes = [
     {
       title: 'Từ vựng',
@@ -107,13 +118,16 @@ export function Home() {
       stats: '200+ câu hỏi'
     }
   ];
-  
-  const recentActivity = [
-    { type: 'Hoàn thành', subject: 'N5 Từ vựng - Bài 12', time: '2 giờ trước', score: 95 },
-    { type: 'Luyện tập', subject: 'N4 Ngữ pháp - Quiz 5', time: '5 giờ trước', score: 87 },
-    { type: 'Hoàn thành', subject: 'N5 Nghe hiểu - Test 3', time: 'Hôm qua', score: 92 }
-  ];
-  
+  const now = new Date();
+  const recentActivity: any[] = [];
+  activity.slice(0, 3).forEach(activity => {
+    recentActivity.push({
+      subject: activity?.exerciseTitle ?? "no title",
+      score: activity?.score ?? 0,
+      time: getTimeAgo(activity?.updatedAt ?? now)
+    })
+  })
+
   return (
     <div className="space-y-6">
       {/* Welcome section */}
@@ -127,7 +141,7 @@ export function Home() {
             </div>
             <div className="text-6xl opacity-20">🎌</div>
           </div>
-          
+
           <div className="flex items-center gap-4">
             <div className="bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 text-sm font-medium">
               🎯 Mục tiêu: Đạt N3 trong 6 tháng
@@ -138,7 +152,7 @@ export function Home() {
           </div>
         </div>
       </div>
-      
+
       {/* Quick stats grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {quickStats.map((stat, index) => {
@@ -157,7 +171,7 @@ export function Home() {
           );
         })}
       </div>
-      
+
       {/* Learning modes */}
       <div>
         <div className="flex items-center justify-between mb-4">
@@ -167,7 +181,7 @@ export function Home() {
             <ArrowRight className="size-4" />
           </Link>
         </div>
-        
+
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
           {learningModes.map((mode, index) => {
             const Icon = mode.icon;
@@ -188,7 +202,7 @@ export function Home() {
           })}
         </div>
       </div>
-      
+
       {/* Two column layout */}
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Quick actions */}
@@ -225,7 +239,7 @@ export function Home() {
               </button>
             </div>
           </div>
-          
+
           {/* Study progress chart */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mt-6">
             <div className="flex items-center justify-between mb-4">
@@ -238,7 +252,7 @@ export function Home() {
               {[65, 45, 80, 55, 90, 70, 85].map((height, index) => (
                 <div key={index} className="flex-1 flex flex-col items-center gap-2">
                   <div className="w-full bg-gray-100 rounded-t-lg overflow-hidden relative group cursor-pointer hover:opacity-80">
-                    <div 
+                    <div
                       className="bg-gradient-to-t from-blue-600 to-blue-400 w-full rounded-t-lg transition-all"
                       style={{ height: `${height}px` }}
                     ></div>
@@ -251,7 +265,7 @@ export function Home() {
             </div>
           </div>
         </div>
-        
+
         {/* Recent activity */}
         <div className="space-y-6">
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
@@ -259,16 +273,22 @@ export function Home() {
               <Clock className="size-5 text-purple-600" />
               Hoạt động gần đây
             </h3>
+
+
             <div className="space-y-3">
+              {recentActivity.length === 0 && (
+                <div>
+                  Chưa có hoạt động nào
+                </div>
+              )}
               {recentActivity.map((activity, index) => (
                 <div key={index} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                  <div className={`size-10 rounded-lg flex items-center justify-center text-white flex-shrink-0 ${
-                    activity.score >= 90 ? 'bg-green-500' : activity.score >= 80 ? 'bg-blue-500' : 'bg-orange-500'
-                  }`}>
+                  <div className={`size-10 rounded-lg flex items-center justify-center text-white flex-shrink-0 ${activity.score >= 90 ? 'bg-green-500' : activity.score >= 80 ? 'bg-blue-500' : 'bg-orange-500'
+                    }`}>
                     <span className="font-bold text-sm">{activity.score}</span>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="text-xs text-gray-500 mb-1">{activity.type}</div>
+                    {/*<div className="text-xs text-gray-500 mb-1">{activity.type}</div>*/}
                     <div className="text-sm font-medium text-gray-900 truncate">{activity.subject}</div>
                     <div className="text-xs text-gray-500 mt-1">{activity.time}</div>
                   </div>
@@ -276,7 +296,7 @@ export function Home() {
               ))}
             </div>
           </div>
-          
+
           {/* Study streak */}
           <div className="bg-gradient-to-br from-orange-500 to-pink-600 rounded-xl shadow-lg p-6 text-white">
             <div className="flex items-center justify-between mb-4">
@@ -293,19 +313,18 @@ export function Home() {
               {[1, 2, 3, 4, 5, 6, 7].map((day) => (
                 <div
                   key={day}
-                  className={`flex-1 h-2 rounded-full ${
-                    day <= stats.streak ? 'bg-white' : 'bg-white/30'
-                  }`}
+                  className={`flex-1 h-2 rounded-full ${day <= stats.streak ? 'bg-white' : 'bg-white/30'
+                    }`}
                 ></div>
               ))}
             </div>
           </div>
         </div>
       </div>
-      
+
       {/* Modals */}
       <MiniTestModal
-        
+
         isOpen={showMiniTestModal}
         onClose={() => setShowMiniTestModal(false)}
         onStart={() => setShowMiniTestModal(false)}

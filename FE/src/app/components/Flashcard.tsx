@@ -9,7 +9,7 @@ interface FlashcardProps {
   totalCards?: number;
 }
 
-export function Flashcard({ card, onNext, onPrevious, currentIndex = 0, totalCards = 0 }: FlashcardProps) {
+export function Flashcard({ card, onNext, onPrevious, currentIndex = 0, totalCards = 0 }: Readonly<FlashcardProps>) {
   const [isFlipped, setIsFlipped] = useState(false);
   
   const handleFlip = () => {
@@ -46,7 +46,7 @@ export function Flashcard({ card, onNext, onPrevious, currentIndex = 0, totalCar
               <div className="text-5xl font-bold text-gray-900 mb-4">
                 {card.front}
               </div>
-              <div className="text-sm text-gray-500">Nhấn để lật thẻ</div>
+              
             </div>
           </div>
           
@@ -67,7 +67,7 @@ export function Flashcard({ card, onNext, onPrevious, currentIndex = 0, totalCar
                   {card.example}
                 </div>
               )}
-              <div className="mt-6 text-sm opacity-75">Nhấn để lật thẻ</div>
+              
             </div>
           </div>
         </div>

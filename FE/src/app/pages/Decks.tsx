@@ -16,81 +16,85 @@ export function Decks() {
   const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
   const [editingDeck, setEditingDeck] = useState<Deck | null>(null);
   const [personalDecks, setPersonalDecks] = useState<Deck[]>([]);
-  
+
+  const userStr = localStorage.getItem('user');
+  const userData = userStr ? JSON.parse(userStr) : null;
+  const userId = userData ? userData.id : null;
   // Load decks from storage
   useEffect(() => {
-  loadDecks();
+    loadDecks();
   }, []);
-  
+
   const loadDecks = async () => {
-    const customDecks = await getDecks();
+    const customDecks = await getDecks(userId);
     setPersonalDecks(customDecks);
   };
-  
+
   // Get decks based on selected tab
   const allDecks = selectedTab === 'personal' ? personalDecks : mockDecks;
-  
+
   // Sort community decks by view count
-  const sortedDecks = selectedTab === 'community' 
+  const sortedDecks = selectedTab === 'community'
     ? [...allDecks].sort((a, b) => (b.viewCount || 0) - (a.viewCount || 0))
     : allDecks;
-  
+
   // Filter decks based on search query
   const filteredDecks = sortedDecks.filter(deck => {
     const matchesSearch = deck.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       deck.description.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesSearch;
   });
-  
+
   // Calculate pagination
   const totalPages = Math.ceil(filteredDecks.length / DECKS_PER_PAGE);
   const startIndex = (currentPage - 1) * DECKS_PER_PAGE;
   const endIndex = startIndex + DECKS_PER_PAGE;
   const currentDecks = filteredDecks.slice(startIndex, endIndex);
-  
+
   // Reset to page 1 when filters change
   const handleTabChange = (tab: 'personal' | 'community') => {
     setSelectedTab(tab);
     setCurrentPage(1);
   };
-  
+
   const handleSearchChange = (query: string) => {
     setSearchQuery(query);
     setCurrentPage(1);
   };
-  
+
   const goToNextPage = () => {
     if (currentPage < totalPages) {
       setCurrentPage(currentPage + 1);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
-  
+
   const goToPreviousPage = () => {
     if (currentPage > 1) {
       setCurrentPage(currentPage - 1);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
-  
+
   const handleCreateDeck = () => {
     setModalMode('create');
     setEditingDeck(null);
     setIsModalOpen(true);
   };
-  
+
   const handleEditDeck = (deck: Deck) => {
     setModalMode('edit');
     setEditingDeck(deck);
     setIsModalOpen(true);
   };
-  
+
   const handleSaveDeck = async (deckData: Partial<Deck>) => {
     if (modalMode === 'create') {
       await createDeck(
+        userId,
         deckData.name!,
         deckData.description!,
-        deckData.cards||[],
+        deckData.cards || [],
         deckData.color,
         deckData.icon,
         deckData.visibility
@@ -101,19 +105,19 @@ export function Decks() {
     await loadDecks();
     setIsModalOpen(false);
   };
-  
+
   const handleDeleteDeck = async (deckId: string) => {
     if (confirm('Bạn có chắc chắn muốn xóa bộ thẻ này?')) {
       await deleteDeck(deckId);
       await loadDecks();
     }
   };
-  
+
   const handleDuplicateDeck = async (deckId: string) => {
     await duplicateDeck(deckId);
     await loadDecks();
   };
-  
+
   const handleExportDeck = (deckId: string) => {
     const jsonData = exportDeck(deckId);
     if (jsonData) {
@@ -126,7 +130,7 @@ export function Decks() {
       URL.revokeObjectURL(url);
     }
   };
-  
+
   const handleImportDeck = async () => {
     const input = document.createElement('input');
     input.type = 'file';
@@ -137,7 +141,7 @@ export function Decks() {
         const reader = new FileReader();
         reader.onload = async (event) => {
           const jsonString = event.target?.result as string;
-          const imported = await importDeck(jsonString);
+          const imported = await importDeck(userId,jsonString);
           if (imported) {
             await loadDecks();
             alert('Import thành công!');
@@ -150,16 +154,13 @@ export function Decks() {
     };
     input.click();
   };
-  
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Flashcard Decks</h2>
-          <p className="text-sm text-gray-600 mt-1">
-            Hiển thị {currentDecks.length} deck ({startIndex + 1}-{Math.min(endIndex, filteredDecks.length)} trên {filteredDecks.length})
-          </p>
         </div>
         {selectedTab === 'personal' && (
           <div className="flex items-center gap-2">
@@ -180,7 +181,7 @@ export function Decks() {
           </div>
         )}
       </div>
-      
+
       {/* Search bar */}
       <div className="relative">
         <Search className="absolute left-4 top-1/2 -translate-y-1/2 size-5 text-gray-400" />
@@ -192,31 +193,29 @@ export function Decks() {
           className="w-full pl-12 pr-4 py-3 bg-white border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
         />
       </div>
-      
+
       {/* Tab filters */}
       <div className="flex gap-2">
         <button
           onClick={() => handleTabChange('personal')}
-          className={`flex-1 px-6 py-3 rounded-xl font-semibold text-base transition-all ${
-            selectedTab === 'personal'
-              ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30'
-              : 'bg-white text-gray-700 border-2 border-gray-200 hover:border-blue-300'
-          }`}
+          className={`flex-1 px-6 py-3 rounded-xl font-semibold text-base transition-all ${selectedTab === 'personal'
+            ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30'
+            : 'bg-white text-gray-700 border-2 border-gray-200 hover:border-blue-300'
+            }`}
         >
           Deck của tôi ({personalDecks.length})
         </button>
-        <button
+        {/*<button
           onClick={() => handleTabChange('community')}
-          className={`flex-1 px-6 py-3 rounded-xl font-semibold text-base transition-all ${
-            selectedTab === 'community'
-              ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30'
-              : 'bg-white text-gray-700 border-2 border-gray-200 hover:border-blue-300'
-          }`}
+          className={`flex-1 px-6 py-3 rounded-xl font-semibold text-base transition-all ${selectedTab === 'community'
+            ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30'
+            : 'bg-white text-gray-700 border-2 border-gray-200 hover:border-blue-300'
+            }`}
         >
           Decks cộng đồng ({mockDecks.length})
-        </button>
+        </button>*/}
       </div>
-      
+
       {/* Decks grid - 4 columns */}
       {currentDecks.length > 0 ? (
         <>
@@ -233,7 +232,7 @@ export function Decks() {
               />
             ))}
           </div>
-          
+
           {/* Pagination controls */}
           {totalPages > 1 && (
             <div className="flex items-center justify-center gap-4 pt-8 pb-4">
@@ -245,7 +244,7 @@ export function Decks() {
               >
                 <ChevronLeft className="size-6" />
               </button>
-              
+
               <div className="flex items-center gap-2">
                 <span className="text-sm text-gray-600 font-medium">
                   Trang
@@ -257,7 +256,7 @@ export function Decks() {
                   / {totalPages}
                 </span>
               </div>
-              
+
               <button
                 onClick={goToNextPage}
                 disabled={currentPage === totalPages}
@@ -275,8 +274,8 @@ export function Decks() {
             {selectedTab === 'personal' ? '📚' : '🌐'}
           </div>
           <p className="text-gray-600 text-lg font-medium">
-            {selectedTab === 'personal' 
-              ? 'Bạn chưa có deck nào' 
+            {selectedTab === 'personal'
+              ? 'Bạn chưa có deck nào'
               : 'Không tìm thấy deck nào'
             }
           </p>
@@ -288,7 +287,7 @@ export function Decks() {
           </p>
         </div>
       )}
-      
+
       {/* Deck Modal */}
       <DeckModal
         isOpen={isModalOpen}
